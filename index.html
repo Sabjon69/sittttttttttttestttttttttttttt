@@ -2,51 +2,49 @@
 <html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     
     <title>DropBid QUANTUM V6 | Infrastructure Professionnelle d'Enchères d'Actifs</title>
-    <meta name="description" content="Solution SaaS de grade industriel pour la gestion et l'automatisation d'enchères d'actifs digitaux. Latence ultra-faible, protocoles de sécurité avancés et interface de trading temps réel.">
-    <meta name="keywords" content="SaaS, Enchères, Trading, Quantum, Infrastructure, Actifs Digitaux, API, Automatisation">
-    <meta property="og:title" content="DropBid QUANTUM V6 - Performance & Sécurité">
-    <meta property="og:type" content="website">
-    <meta name="robots" content="index, follow">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "DropBid Quantum",
-      "softwareVersion": "6.0",
-      "applicationCategory": "FinanceApplication",
-      "offers": { "@type": "Offer", "price": "0.00", "priceCurrency": "EUR" }
-    }
-    </script>
+    <meta name="description" content="Solution SaaS de grade industriel pour la gestion et l'automatisation d'enchères d'actifs digitaux.">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .glass-panel { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
         .nav-active { background: rgba(79, 70, 229, 0.1); border-left: 3px solid #4f46e5; color: white !important; }
         .gradient-text { background: linear-gradient(135deg, #fff 30%, #4f46e5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         .glow-dot { box-shadow: 0 0 15px #10b981; }
+
+        /* Correction Mobile : Sidebar cachée par défaut sur petit écran */
+        @media (max-width: 1024px) {
+            #sidebar { transform: translateX(-100%); width: 280px; }
+            #sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+        }
     </style>
 </head>
 <body class="bg-[#010409] text-slate-300 antialiased selection:bg-indigo-500/30 selection:text-indigo-200 custom-scrollbar">
 
+    <button onclick="toggleSidebar()" class="lg:hidden fixed bottom-6 right-6 z-[2000] w-14 h-14 bg-indigo-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl active:scale-95 transition-all">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[950] hidden lg:hidden"></div>
+
     <div id="toast-container" class="fixed top-6 right-6 z-[2000] flex flex-col gap-4 pointer-events-none"></div>
 
     <section id="auth-modal" class="fixed inset-0 z-[1800] bg-black/95 backdrop-blur-2xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-12 relative border border-white/10 shadow-2xl">
+        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-8 lg:p-12 relative border border-white/10 shadow-2xl">
             <button onclick="closeAuthModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white transition-transform hover:rotate-90"><i class="fa-solid fa-xmark text-2xl"></i></button>
             <div class="w-20 h-20 bg-indigo-600/20 rounded-3xl flex items-center justify-center text-3xl text-indigo-500 mx-auto mb-8 border border-indigo-500/30">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <h2 class="text-4xl font-black text-white text-center mb-2 uppercase tracking-tighter">Accès Terminal</h2>
+            <h2 class="text-3xl lg:text-4xl font-black text-white text-center mb-2 uppercase tracking-tighter">Accès Terminal</h2>
             <p class="text-slate-500 text-center text-sm mb-10">Veuillez entrer vos identifiants pour établir la liaison.</p>
             
             <form id="login-form" class="space-y-6" onsubmit="event.preventDefault();">
@@ -65,164 +63,129 @@
         </div>
     </section>
 
-    <aside class="fixed left-0 top-0 h-full w-20 lg:w-80 bg-[#010409] border-r border-white/5 flex flex-col z-[1000] transition-all duration-300">
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-80 bg-[#010409] border-r border-white/5 flex flex-col z-[1000] transition-all duration-300 shadow-2xl lg:shadow-none">
         <div class="p-8 border-b border-white/5 flex items-center gap-4 group">
             <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-bolt-lightning text-white text-2xl"></i>
             </div>
-            <div class="hidden lg:block">
+            <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase leading-none italic">Drop<span class="text-indigo-500 text-3xl">Bid</span></h1>
                 <p class="text-[8px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-1">Quantum Infrastructure</p>
             </div>
         </div>
 
         <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
-            <p class="hidden lg:block text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-6">Menu de Contrôle</p>
+            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-6">Menu de Contrôle</p>
             
-            <button onclick="switchTab('home', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group">
+            <button onclick="handleNav('home', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-layer-group w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm">Tableau de bord</span>
+                <span class="font-bold text-sm">Tableau de bord</span>
             </button>
 
-            <button onclick="switchTab('live', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group">
+            <button onclick="handleNav('live', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-chart-line w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm">Marché en Direct</span>
+                <span class="font-bold text-sm">Marché en Direct</span>
             </button>
 
-            <button onclick="switchTab('admin', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group">
+            <button onclick="handleNav('admin', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-plus-circle w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm">Nouvelle Enchère</span>
+                <span class="font-bold text-sm">Nouvelle Enchère</span>
             </button>
 
-            <button onclick="switchTab('inventory', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group">
+            <button onclick="handleNav('inventory', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-box-archive w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm">Gestion des Actifs</span>
+                <span class="font-bold text-sm">Gestion des Actifs</span>
             </button>
 
             <div class="h-px bg-white/5 my-8 mx-4"></div>
 
-            <button onclick="switchTab('guide', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
+            <button onclick="handleNav('guide', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-book w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm">Documentation API</span>
+                <span class="font-bold text-sm">Documentation API</span>
             </button>
         </nav>
 
         <div class="p-6 border-t border-white/5 bg-black/20">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse glow-dot"></div>
-                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Core Engine Active</span>
+                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest text-xs">Core Engine Active</span>
             </div>
         </div>
     </aside>
 
-    <main class="ml-20 lg:ml-80 min-h-screen">
+    <main class="main-content lg:ml-80 min-h-screen transition-all duration-300">
         
-        <header class="sticky top-0 z-[500] bg-[#010409]/80 backdrop-blur-md border-b border-white/5 p-8 lg:p-12 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+        <header class="sticky top-0 z-[500] bg-[#010409]/80 backdrop-blur-md border-b border-white/5 p-6 lg:p-12 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
             <div>
-                <h1 id="view-title" class="text-5xl lg:text-7xl font-black text-white uppercase tracking-tighter leading-none italic">TABLEAU DE BORD</h1>
-                <p id="view-subtitle" class="text-indigo-500 text-sm mt-4 font-bold tracking-[0.2em] uppercase">Système Quantum v6.1.4 • Analyse des flux en temps réel</p>
+                <h1 id="view-title" class="text-4xl lg:text-7xl font-black text-white uppercase tracking-tighter leading-none italic">TABLEAU DE BORD</h1>
+                <p id="view-subtitle" class="text-indigo-500 text-xs lg:text-sm mt-4 font-bold tracking-[0.2em] uppercase">Système Quantum v6.1.4 • Analyse des flux</p>
             </div>
             <div class="flex gap-4">
-                <div class="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl text-center min-w-[120px]">
+                <div class="bg-white/5 border border-white/10 px-4 py-2 lg:px-6 lg:py-3 rounded-2xl text-center min-w-[100px]">
                     <p class="text-[9px] text-slate-500 font-black uppercase">Statut Latence</p>
                     <p class="text-white font-mono font-bold">14ms</p>
                 </div>
             </div>
         </header>
 
-        <div class="p-8 lg:p-16 max-w-7xl mx-auto">
+        <div class="p-6 lg:p-16 max-w-7xl mx-auto">
             
-           <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-    
-    <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-        <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-600/5 rounded-full blur-3xl group-hover:bg-indigo-600/20 transition-all"></div>
-        
-        <div class="relative z-10">
-            <div class="flex justify-between items-start mb-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Volume Flux (24h)</p>
-                <div class="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-500 border border-indigo-500/20">
-                    <i class="fa-solid fa-chart-line text-xs"></i>
+           <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Volume Flux (24h)</p>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <h3 id="stat-volume" class="text-4xl font-black text-white tracking-tighter tabular-nums">0.00</h3>
+                            <span class="text-indigo-500 font-bold text-xl font-mono">€</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Temps Réel
+                        </p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="flex items-baseline gap-2 mb-2">
-                <h3 id="stat-volume" class="text-4xl font-black text-white tracking-tighter tabular-nums">0.00</h3>
-                <span class="text-indigo-500 font-bold text-xl font-mono">€</span>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <span class="flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Temps Réel</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-        <div class="relative z-10">
-            <div class="flex justify-between items-start mb-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Unités de Liaison</p>
-                <div class="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center text-violet-500 border border-violet-500/20">
-                    <i class="fa-solid fa-circle-nodes text-xs"></i>
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Unités de Liaison</p>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <h3 id="stat-nodes" class="text-4xl font-black text-white tracking-tighter tabular-nums">0</h3>
+                            <span class="text-slate-500 font-bold text-sm uppercase tracking-widest">Actifs</span>
+                        </div>
+                        <div class="w-full bg-white/5 h-[4px] rounded-full mt-4 overflow-hidden">
+                            <div class="bg-violet-500 h-full w-2/3 shadow-[0_0_10px_#8b5cf6]"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="flex items-baseline gap-2 mb-2">
-                <h3 id="stat-nodes" class="text-4xl font-black text-white tracking-tighter tabular-nums">0</h3>
-                <span class="text-slate-500 font-bold text-sm uppercase tracking-widest">Actifs</span>
-            </div>
-            
-            <div class="w-full bg-white/5 h-[4px] rounded-full mt-4 overflow-hidden">
-                <div class="bg-violet-500 h-full w-2/3 shadow-[0_0_10px_#8b5cf6]"></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-        <div class="relative z-10">
-            <div class="flex justify-between items-start mb-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Latence Réseau</p>
-                <div class="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500 border border-emerald-500/20">
-                    <i class="fa-solid fa-bolt text-xs"></i>
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Latence Réseau</p>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <h3 id="stat-latency" class="text-4xl font-black text-white tracking-tighter tabular-nums">14</h3>
+                            <span class="text-emerald-500 font-bold text-xs uppercase">ms</span>
+                        </div>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase">Optimisation : <span class="text-white">Active</span></p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="flex items-baseline gap-2 mb-2">
-                <h3 id="stat-latency" class="text-4xl font-black text-white tracking-tighter tabular-nums">14</h3>
-                <span class="text-emerald-500 font-bold text-xl font-mono text-xs uppercase">ms</span>
-            </div>
-            
-            <p class="text-[9px] text-slate-500 font-bold uppercase">Optimisation : <span class="text-white">Active</span></p>
-        </div>
-    </div>
 
-    <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-        <div class="relative z-10">
-            <div class="flex justify-between items-start mb-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Indice de Confiance</p>
-                <div class="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500 border border-amber-500/20">
-                    <i class="fa-solid fa-shield-check text-xs"></i>
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Indice de Confiance</p>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <h3 id="stat-reliability" class="text-4xl font-black text-white tracking-tighter tabular-nums">99.9</h3>
+                            <span class="text-amber-500 font-bold text-xl font-mono">%</span>
+                        </div>
+                        <div class="flex gap-1 mt-2">
+                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
+                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
+                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
+                            <div class="h-1 w-full bg-slate-800 rounded-full"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="flex items-baseline gap-2 mb-2">
-                <h3 id="stat-reliability" class="text-4xl font-black text-white tracking-tighter tabular-nums">99.9</h3>
-                <span class="text-amber-500 font-bold text-xl font-mono">%</span>
-            </div>
-            
-            <div class="flex gap-1 mt-2">
-                <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                <div class="h-1 w-full bg-slate-800 rounded-full"></div>
-            </div>
-        </div>
-    </div>
-</section>
+           </section>
 
-            <div id="app-content" class="min-h-[500px] animate-fade">
+            <div id="app-content" class="min-h-[400px]">
                 <div class="flex flex-col items-center justify-center h-full text-center py-20">
                     <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-500 mb-6"></i>
                     <p class="text-slate-500 font-mono italic">Initialisation de l'interface Quantum...</p>
@@ -230,92 +193,102 @@
             </div>
 
             <section class="mt-40 border-t border-white/5 pt-20">
-                <div class="text-center mb-20">
-                    <h2 class="text-4xl lg:text-6xl font-black text-white uppercase tracking-tighter mb-6 italic italic">Pourquoi choisir l'infrastructure <span class="text-indigo-500">DropBid</span> ?</h2>
-                    <p class="text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed">Une architecture conçue pour les opérateurs exigeants. Rapidité, intégrité et automatisation au cœur de chaque transaction.</p>
+                <div class="text-center mb-20 px-4">
+                    <h2 class="text-3xl lg:text-6xl font-black text-white uppercase tracking-tighter mb-6 italic italic">Pourquoi choisir l'infrastructure <span class="text-indigo-500">DropBid</span> ?</h2>
+                    <p class="text-slate-500 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed">Une architecture conçue pour les opérateurs exigeants. Rapidité, intégrité et automatisation.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-3 gap-12">
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-indigo-600/10 rounded-3xl flex items-center justify-center text-2xl text-indigo-500 border border-indigo-500/20">
-                            <i class="fa-solid fa-microchip"></i>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    <article class="space-y-6 p-4">
+                        <div class="w-16 h-16 bg-indigo-600/10 rounded-3xl flex items-center justify-center text-2xl text-indigo-500 border border-indigo-500/20"><i class="fa-solid fa-microchip"></i></div>
                         <h4 class="text-2xl font-black text-white uppercase tracking-tight">Technologie Quantum</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Notre algorithme propriétaire gère la mise en concurrence des offres en millisecondes, éliminant tout risque de slippage et optimisant vos prix d'achat/vente instantanément.</p>
+                        <p class="text-slate-500 leading-relaxed text-sm">Notre algorithme propriétaire gère la mise en concurrence des offres en millisecondes, éliminant tout risque de slippage.</p>
                     </article>
 
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-emerald-600/10 rounded-3xl flex items-center justify-center text-2xl text-emerald-500 border border-emerald-500/20">
-                            <i class="fa-solid fa-vault"></i>
-                        </div>
+                    <article class="space-y-6 p-4">
+                        <div class="w-16 h-16 bg-emerald-600/10 rounded-3xl flex items-center justify-center text-2xl text-emerald-500 border border-emerald-500/20"><i class="fa-solid fa-vault"></i></div>
                         <h4 class="text-2xl font-black text-white uppercase tracking-tight">Sécurité de Grade Militaire</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Chaque transaction est sécurisée par un protocole de chiffrement AES-256 avec validation multi-signatures. Vos actifs sont protégés dans des environnements isolés et auditables.</p>
+                        <p class="text-slate-500 leading-relaxed text-sm">Chaque transaction est sécurisée par un protocole de chiffrement AES-256 avec validation multi-signatures.</p>
                     </article>
 
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-amber-600/10 rounded-3xl flex items-center justify-center text-2xl text-amber-500 border border-amber-500/20">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight">Assistance Opérationnelle</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Accédez à une équipe d'ingénieurs réseaux disponible 24/7. Nous garantissons une disponibilité de l'infrastructure de 99.9% pour vos opérations critiques.</p>
+                    <article class="space-y-6 p-4">
+                        <div class="w-16 h-16 bg-amber-600/10 rounded-3xl flex items-center justify-center text-2xl text-amber-500 border border-amber-500/20"><i class="fa-solid fa-headset"></i></div>
+                        <h4 class="text-2xl font-black text-white uppercase tracking-tight">Assistance</h4>
+                        <p class="text-slate-500 leading-relaxed text-sm">Accédez à une équipe d'ingénieurs réseaux disponible 24/7. Nous garantissons une disponibilité de 99.9%.</p>
                     </article>
                 </div>
             </section>
 
-            <section class="mt-40 max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-12 text-center">Questions Stratégiques</h2>
+            <section class="mt-40 max-w-4xl mx-auto px-4">
+                <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-12 text-center italic">Questions Stratégiques</h2>
                 <div class="space-y-4">
-                    <details class="glass-panel rounded-3xl p-8 group cursor-pointer border border-white/5 hover:border-indigo-500/30 transition-all">
-                        <summary class="list-none flex justify-between items-center font-bold text-white uppercase tracking-widest text-sm">
-                            Comment DropBid garantit-il la rapidité des transactions ?
+                    <details class="glass-panel rounded-3xl p-6 lg:p-8 group cursor-pointer border border-white/5 hover:border-indigo-500/30 transition-all">
+                        <summary class="list-none flex justify-between items-center font-bold text-white uppercase tracking-widest text-xs lg:text-sm">
+                            Comment DropBid garantit-il la rapidité ?
                             <span class="text-indigo-500 group-open:rotate-180 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
                         </summary>
                         <p class="mt-6 text-slate-500 leading-relaxed text-sm border-t border-white/5 pt-6">
-                            L'infrastructure utilise des serveurs edge positionnés stratégiquement pour réduire la latence réseau. Notre moteur de calcul Quantum traite les requêtes parallèlement pour une fluidité absolue.
+                            L'infrastructure utilise des serveurs edge positionnés stratégiquement pour réduire la latence réseau. Notre moteur de calcul Quantum traite les requêtes parallèlement.
                         </p>
                     </details>
-                    </div>
+                </div>
             </section>
         </div>
 
-        <footer class="mt-40 bg-black/60 border-t border-white/5 p-16 lg:p-24">
+        <footer class="mt-40 bg-black/60 border-t border-white/5 p-12 lg:p-24">
             <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-16 mb-20">
                 <div class="max-w-sm">
                     <div class="flex items-center gap-4 mb-8">
                         <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-bolt-lightning text-white"></i></div>
-                        <span class="text-2xl font-black text-white italic">DropBid.</span>
+                        <span class="text-2xl font-black text-white italic tracking-tighter">DropBid.</span>
                     </div>
-                    <p class="text-slate-500 text-sm leading-relaxed">
-                        L'infrastructure logicielle de référence pour la nouvelle économie digitale. Performance, Transparence, et Élite Technologique.
-                    </p>
+                    <p class="text-slate-500 text-sm leading-relaxed">Infrastructure logicielle de référence pour la nouvelle économie digitale. Performance et Transparence.</p>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-24">
                     <div>
                         <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Réseau</h5>
-                        <ul class="space-y-4 text-xs font-bold text-slate-500">
+                        <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
                             <li><a href="#" class="hover:text-white transition-colors">Marché Global</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Nodes de Validation</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Nodes Status</a></li>
                         </ul>
                     </div>
                     <div>
                         <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Légal</h5>
-                        <ul class="space-y-4 text-xs font-bold text-slate-500">
+                        <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
                             <li><a href="#" class="hover:text-white transition-colors">Confidentialité</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Conditions Générales</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Conformité SOC-2</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Conformité</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="border-t border-white/5 pt-12 text-center">
-                <p class="text-[10px] text-slate-600 font-black uppercase tracking-[0.5em]">
-                    © 2026 QUANTUM NETWORK OPERATIONS. TOUS DROITS RÉSERVÉS.
-                </p>
+                <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.5em]">© 2026 QUANTUM NETWORK OPERATIONS.</p>
             </div>
         </footer>
     </main>
 
+    <script>
+        // TOGGLE MENU MOBILE
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // NAVIGATION ADAPTÉE (Mobile friendly)
+        function handleNav(tab, event) {
+            // Appelle la logique de ton engine.js
+            if (typeof switchTab === 'function') {
+                switchTab(tab, event);
+            }
+            
+            // Ferme le menu sur mobile après sélection
+            if (window.innerWidth < 1024) {
+                toggleSidebar();
+            }
+        }
+    </script>
     <script src="engine.js" defer></script>
 </body>
 </html>
