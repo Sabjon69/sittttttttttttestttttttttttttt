@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animation de scanline pour l'effet Cyber */
+        .scanline {
+            width: 100%;
+            height: 2px;
+            z-index: 5;
+            background: rgba(99, 102, 241, 0.1);
+            position: absolute;
+            animation: scanline 6s linear infinite;
+        }
+        @keyframes scanline {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-transparent">
+    <div class="animate-view-enter max-w-md mx-auto mt-20 px-4">
+        
+        <div class="relative glass-panel p-10 rounded-[2.5rem] border border-white/10 bg-[#010409]/95 backdrop-blur-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            
+            <div class="scanline"></div>
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
+
+            <div class="text-center mb-10 relative z-10">
+                <div class="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/20 shadow-[0_0_30px_rgba(79,70,229,0.2)]">
+                    <i class="fa-solid fa-fingerprint text-4xl text-indigo-500"></i>
+                </div>
+                <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Identification</h2>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-2 text-center">Système Quantum v2.0</p>
+            </div>
+
+            <div class="space-y-6 relative z-10">
+                <div class="group">
+                    <div class="flex justify-between mb-2 px-2">
+                        <label class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Identifiant Réseau</label>
+                        <span class="text-[8px] text-indigo-500/50 font-mono uppercase">Signal Ready</span>
+                    </div>
+                    
+                    <div class="relative">
+                        <i class="fa-solid fa-terminal absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors"></i>
+                        
+                        <input type="text" id="FINAL-LOGIN-INPUT" 
+                            class="w-full bg-black/60 border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono text-sm placeholder:text-slate-800" 
+                            placeholder="root@operator"
+                            autocomplete="off"
+                            onkeypress="if(event.key === 'Enter') executeLogin()">
+                    </div>
+                </div>
+                
+                <button onclick="executeLogin()" class="group relative w-full overflow-hidden py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-[0.4em] transition-all hover:tracking-[0.5em] active:scale-95 shadow-xl">
+                    <span class="relative z-10">Initialiser la Liaison</span>
+                </button>
+
+                <div class="flex flex-col items-center gap-4 mt-6">
+                    <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                        Encryption AES-256 Active
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

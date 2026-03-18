@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  /* On définit nos couleurs personnalisées ici */
+  --color-luxury-bg: #020617;
+  --color-luxury-panel: #0f172a;
+  --color-luxury-gold: #fbbf24;
+}
+
+/* Tes styles personnalisés qui s'ajoutent à Tailwind */
+@layer components {
+  .glass-panel {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-item-active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+    border-left: 3px solid #6366f1;
+    color: #818cf8 !important;
+  }
+}
+
+
+@layer components {
+  /* Animation d'entrée douce */
+  .view-enter {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px); /* Commence un peu plus bas */
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0); /* Arrive à sa place */
+    }
+  }
+
+  /* Transition sur les boutons de la nav */
+  .nav-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+
+/* On force le fond très noir sur le body */
+body {
+  background-color: #020617 !important;
+  color: #94a3b8;
+}
+
+/* On adoucit les titres (pas de blanc pur) */
+h1, h2, h3 {
+  color: #f8fafc !important;
+}
