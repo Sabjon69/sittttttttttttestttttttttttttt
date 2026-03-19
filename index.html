@@ -2,36 +2,38 @@
 <html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>DropBid QUANTUM V6 | Infrastructure Professionnelle d'Enchères d'Actifs</title>
-    <meta name="description" content="Solution SaaS de grade industriel pour la gestion et l'automatisation d'enchères d'actifs digitaux.">
-
+    <title>DropBid QUANTUM V6 | Infrastructure Professionnelle</title>
+    
+    <meta name="description" content="Solution SaaS de grade industriel pour la gestion d'actifs digitaux.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass-panel { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .nav-active { background: rgba(79, 70, 229, 0.1); border-left: 3px solid #4f46e5; color: white !important; }
-        .gradient-text { background: linear-gradient(135deg, #fff 30%, #4f46e5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        body { font-family: 'Inter', sans-serif; background-color: #010409; color: #cbd5e1; overflow-x: hidden; }
+        
+        /* Glassmorphism Pro */
+        .glass-panel { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .nav-active { background: rgba(79, 70, 229, 0.15); border-left: 4px solid #4f46e5; color: white !important; }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        .glow-dot { box-shadow: 0 0 15px #10b981; }
 
-        /* Correction Mobile : Sidebar cachée par défaut sur petit écran */
+        /* Mobile Sidebar Logic */
         @media (max-width: 1024px) {
-            #sidebar { transform: translateX(-100%); width: 280px; }
+            #sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             #sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0 !important; }
         }
     </style>
 </head>
-<body class="bg-[#010409] text-slate-300 antialiased selection:bg-indigo-500/30 selection:text-indigo-200 custom-scrollbar">
+<body class="antialiased custom-scrollbar">
 
-    <button onclick="toggleSidebar()" class="lg:hidden fixed bottom-6 right-6 z-[2000] w-14 h-14 bg-indigo-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl active:scale-95 transition-all">
-        <i class="fa-solid fa-bars"></i>
+    <button onclick="toggleSidebar()" class="lg:hidden fixed bottom-6 right-6 z-[2000] w-14 h-14 bg-indigo-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl active:scale-90 transition-transform">
+        <i class="fa-solid fa-terminal" id="menu-icon"></i>
     </button>
 
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[950] hidden lg:hidden"></div>
@@ -39,22 +41,22 @@
     <div id="toast-container" class="fixed top-6 right-6 z-[2000] flex flex-col gap-4 pointer-events-none"></div>
 
     <section id="auth-modal" class="fixed inset-0 z-[1800] bg-black/95 backdrop-blur-2xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-8 lg:p-12 relative border border-white/10 shadow-2xl">
+        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-8 lg:p-12 relative border border-white/10 shadow-2xl text-center">
             <button onclick="closeAuthModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white transition-transform hover:rotate-90"><i class="fa-solid fa-xmark text-2xl"></i></button>
             <div class="w-20 h-20 bg-indigo-600/20 rounded-3xl flex items-center justify-center text-3xl text-indigo-500 mx-auto mb-8 border border-indigo-500/30">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <h2 class="text-3xl lg:text-4xl font-black text-white text-center mb-2 uppercase tracking-tighter">Accès Terminal</h2>
-            <p class="text-slate-500 text-center text-sm mb-10">Veuillez entrer vos identifiants pour établir la liaison.</p>
+            <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-2 italic">Accès Terminal</h2>
+            <p class="text-slate-500 text-sm mb-10 font-mono italic">Établissement de la liaison sécurisée...</p>
             
-            <form id="login-form" class="space-y-6" onsubmit="event.preventDefault();">
+            <form id="login-form" class="space-y-6 text-left" onsubmit="event.preventDefault();">
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 ml-2">Opérateur</label>
-                    <input type="text" id="login-username" placeholder="Identifiant..." class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all shadow-inner">
+                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 ml-2">Identifiant Opérateur</label>
+                    <input type="text" id="login-username" placeholder="ROOT_ID" class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all">
                 </div>
                 <div>
                     <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 ml-2">Clé de sécurité</label>
-                    <input type="password" id="login-password" placeholder="••••••••" class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all shadow-inner">
+                    <input type="password" id="login-password" placeholder="••••••••" class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all">
                 </div>
                 <button type="submit" onclick="executeLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-white transition-all transform active:scale-95 shadow-xl shadow-indigo-600/20 uppercase tracking-widest">
                     Initier la session
@@ -63,19 +65,19 @@
         </div>
     </section>
 
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-80 bg-[#010409] border-r border-white/5 flex flex-col z-[1000] transition-all duration-300 shadow-2xl lg:shadow-none">
-        <div class="p-8 border-b border-white/5 flex items-center gap-4 group">
-            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-80 bg-[#010409] border-r border-white/5 flex flex-col z-[1000]">
+        <div class="p-8 border-b border-white/5 flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-lg">
                 <i class="fa-solid fa-bolt-lightning text-white text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-black text-white tracking-tighter uppercase leading-none italic">Drop<span class="text-indigo-500 text-3xl">Bid</span></h1>
-                <p class="text-[8px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-1">Quantum Infrastructure</p>
+                <h1 class="text-2xl font-black text-white tracking-tighter uppercase italic">Drop<span class="text-indigo-500">Bid</span></h1>
+                <p class="text-[8px] text-slate-500 font-bold tracking-[0.3em] uppercase">Quantum Infrastructure</p>
             </div>
         </div>
 
         <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
-            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-6">Menu de Contrôle</p>
+            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-4">Commandes</p>
             
             <button onclick="handleNav('home', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-layer-group w-6 text-xl group-hover:text-indigo-400"></i> 
@@ -97,7 +99,7 @@
                 <span class="font-bold text-sm">Gestion des Actifs</span>
             </button>
 
-            <div class="h-px bg-white/5 my-8 mx-4"></div>
+            <div class="h-px bg-white/5 my-6 mx-4"></div>
 
             <button onclick="handleNav('guide', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
                 <i class="fa-solid fa-book w-6 text-xl group-hover:text-indigo-400"></i> 
@@ -105,130 +107,115 @@
             </button>
         </nav>
 
-        <div class="p-6 border-t border-white/5 bg-black/20">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse glow-dot"></div>
-                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest text-xs">Core Engine Active</span>
-            </div>
+        <div class="p-6 border-t border-white/5 bg-black/20 flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest italic">Node Active: Primary</span>
         </div>
     </aside>
 
-    <main class="main-content lg:ml-80 min-h-screen transition-all duration-300">
+    <main class="main-content lg:ml-80 min-h-screen transition-all">
         
         <header class="sticky top-0 z-[500] bg-[#010409]/80 backdrop-blur-md border-b border-white/5 p-6 lg:p-12 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
             <div>
-                <h1 id="view-title" class="text-4xl lg:text-7xl font-black text-white uppercase tracking-tighter leading-none italic">TABLEAU DE BORD</h1>
-                <p id="view-subtitle" class="text-indigo-500 text-xs lg:text-sm mt-4 font-bold tracking-[0.2em] uppercase">Système Quantum v6.1.4 • Analyse des flux</p>
+                <h1 id="view-title" class="text-4xl lg:text-7xl font-black text-white uppercase tracking-tighter italic leading-none">TERMINAL</h1>
+                <p id="view-subtitle" class="text-indigo-500 text-xs font-bold tracking-[0.2em] uppercase mt-2">v6.1.4 • Monitoring Flux Haute Vélocité</p>
             </div>
-            <div class="flex gap-4">
-                <div class="bg-white/5 border border-white/10 px-4 py-2 lg:px-6 lg:py-3 rounded-2xl text-center min-w-[100px]">
-                    <p class="text-[9px] text-slate-500 font-black uppercase">Statut Latence</p>
-                    <p class="text-white font-mono font-bold">14ms</p>
-                </div>
+            <div class="bg-indigo-600/10 border border-indigo-500/20 px-6 py-3 rounded-2xl hidden sm:block">
+                <p class="text-[9px] text-slate-500 font-black uppercase">Statut Système</p>
+                <p class="text-indigo-400 font-mono font-bold uppercase text-xs">OPTIMAL [14ms]</p>
             </div>
         </header>
 
         <div class="p-6 lg:p-16 max-w-7xl mx-auto">
             
-           <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Volume Flux (24h)</p>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <h3 id="stat-volume" class="text-4xl font-black text-white tracking-tighter tabular-nums">0.00</h3>
-                            <span class="text-indigo-500 font-bold text-xl font-mono">€</span>
-                        </div>
-                        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Temps Réel
-                        </p>
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                
+                <div class="glass-panel p-8 rounded-[2.5rem] border-l-4 border-l-indigo-500 relative overflow-hidden group">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Liquidité Injectée (24h)</p>
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <h3 id="stat-volume" class="text-4xl font-black text-white tracking-tighter italic">1.24M</h3>
+                        <span class="text-indigo-500 font-bold text-xl font-mono">€</span>
+                    </div>
+                    <p class="text-[9px] text-emerald-500 font-bold uppercase flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Flux de Trésorerie Actif
+                    </p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Instances de Calcul</p>
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <h3 id="stat-nodes" class="text-4xl font-black text-white tracking-tighter">14</h3>
+                        <span class="text-slate-500 font-bold text-sm uppercase">Clusters</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-[2px] mt-4 overflow-hidden">
+                        <div class="bg-indigo-500 h-full w-2/3 shadow-[0_0_10px_#4f46e5]"></div>
                     </div>
                 </div>
 
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Unités de Liaison</p>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <h3 id="stat-nodes" class="text-4xl font-black text-white tracking-tighter tabular-nums">0</h3>
-                            <span class="text-slate-500 font-bold text-sm uppercase tracking-widest">Actifs</span>
-                        </div>
-                        <div class="w-full bg-white/5 h-[4px] rounded-full mt-4 overflow-hidden">
-                            <div class="bg-violet-500 h-full w-2/3 shadow-[0_0_10px_#8b5cf6]"></div>
-                        </div>
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Temps de Réponse (RTT)</p>
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <h3 id="stat-latency" class="text-4xl font-black text-white tracking-tighter italic">14</h3>
+                        <span class="text-emerald-500 font-bold text-xs uppercase">μs</span>
                     </div>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase italic">Latence Intra-Cluster: <span class="text-white">NOMINAL</span></p>
                 </div>
 
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Latence Réseau</p>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <h3 id="stat-latency" class="text-4xl font-black text-white tracking-tighter tabular-nums">14</h3>
-                            <span class="text-emerald-500 font-bold text-xs uppercase">ms</span>
-                        </div>
-                        <p class="text-[9px] text-slate-500 font-bold uppercase">Optimisation : <span class="text-white">Active</span></p>
+                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group border-b-4 border-b-amber-500/20">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Disponibilité (SLA)</p>
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <h3 id="stat-reliability" class="text-4xl font-black text-white tracking-tighter tabular-nums">99.99</h3>
+                        <span class="text-amber-500 font-bold text-xl font-mono">%</span>
                     </div>
+                    <p class="text-[9px] text-amber-500 font-black uppercase italic tracking-tighter">Grade Institutionnel</p>
                 </div>
 
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-500">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Indice de Confiance</p>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <h3 id="stat-reliability" class="text-4xl font-black text-white tracking-tighter tabular-nums">99.9</h3>
-                            <span class="text-amber-500 font-bold text-xl font-mono">%</span>
-                        </div>
-                        <div class="flex gap-1 mt-2">
-                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                            <div class="h-1 w-full bg-amber-500 rounded-full"></div>
-                            <div class="h-1 w-full bg-slate-800 rounded-full"></div>
-                        </div>
-                    </div>
-                </div>
-           </section>
+            </section>
 
             <div id="app-content" class="min-h-[400px]">
                 <div class="flex flex-col items-center justify-center h-full text-center py-20">
-                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-500 mb-6"></i>
-                    <p class="text-slate-500 font-mono italic">Initialisation de l'interface Quantum...</p>
+                    <i class="fa-solid fa-spinner fa-spin text-4xl text-indigo-500 mb-6"></i>
+                    <p class="text-slate-500 font-mono italic">Synchronisation avec le noyau DropBid...</p>
                 </div>
             </div>
 
             <section class="mt-40 border-t border-white/5 pt-20">
                 <div class="text-center mb-20 px-4">
-                    <h2 class="text-3xl lg:text-6xl font-black text-white uppercase tracking-tighter mb-6 italic italic">Pourquoi choisir l'infrastructure <span class="text-indigo-500">DropBid</span> ?</h2>
-                    <p class="text-slate-500 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed">Une architecture conçue pour les opérateurs exigeants. Rapidité, intégrité et automatisation.</p>
+                    <h2 class="text-3xl lg:text-6xl font-black text-white uppercase tracking-tighter mb-6 italic">Ingénierie <span class="text-indigo-500">DropBid</span></h2>
+                    <p class="text-slate-500 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed font-medium">Une infrastructure propriétaire conçue pour les opérateurs exigeants où chaque milliseconde compte.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    <article class="space-y-6 p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-4">
+                    <article class="space-y-6">
                         <div class="w-16 h-16 bg-indigo-600/10 rounded-3xl flex items-center justify-center text-2xl text-indigo-500 border border-indigo-500/20"><i class="fa-solid fa-microchip"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight">Technologie Quantum</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Notre algorithme propriétaire gère la mise en concurrence des offres en millisecondes, éliminant tout risque de slippage.</p>
+                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Moteur Quantum</h4>
+                        <p class="text-slate-500 leading-relaxed text-sm">Traitement parallélisé des ordres d'enchères. Zéro latence de calcul pour une exécution chirurgicale des transactions.</p>
                     </article>
 
-                    <article class="space-y-6 p-4">
-                        <div class="w-16 h-16 bg-emerald-600/10 rounded-3xl flex items-center justify-center text-2xl text-emerald-500 border border-emerald-500/20"><i class="fa-solid fa-vault"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight">Sécurité de Grade Militaire</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Chaque transaction est sécurisée par un protocole de chiffrement AES-256 avec validation multi-signatures.</p>
+                    <article class="space-y-6">
+                        <div class="w-16 h-16 bg-emerald-600/10 rounded-3xl flex items-center justify-center text-2xl text-emerald-500 border border-emerald-500/20"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Chiffrement AES-512</h4>
+                        <p class="text-slate-500 leading-relaxed text-sm">Sécurité de grade souverain. Chaque actif est verrouillé par un protocole multi-signature auditable en temps réel.</p>
                     </article>
 
-                    <article class="space-y-6 p-4">
+                    <article class="space-y-6">
                         <div class="w-16 h-16 bg-amber-600/10 rounded-3xl flex items-center justify-center text-2xl text-amber-500 border border-amber-500/20"><i class="fa-solid fa-headset"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight">Assistance</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Accédez à une équipe d'ingénieurs réseaux disponible 24/7. Nous garantissons une disponibilité de 99.9%.</p>
+                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Support Critique</h4>
+                        <p class="text-slate-500 leading-relaxed text-sm">Ligne directe avec nos ingénieurs système 24/7/365. Nous garantissons une stabilité totale de vos flux stratégiques.</p>
                     </article>
                 </div>
             </section>
 
             <section class="mt-40 max-w-4xl mx-auto px-4">
-                <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-12 text-center italic">Questions Stratégiques</h2>
+                <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-12 text-center italic">Compliance & Protocole</h2>
                 <div class="space-y-4">
                     <details class="glass-panel rounded-3xl p-6 lg:p-8 group cursor-pointer border border-white/5 hover:border-indigo-500/30 transition-all">
                         <summary class="list-none flex justify-between items-center font-bold text-white uppercase tracking-widest text-xs lg:text-sm">
-                            Comment DropBid garantit-il la rapidité ?
+                            Comment DropBid garantit-il l'intégrité des enchères ?
                             <span class="text-indigo-500 group-open:rotate-180 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
                         </summary>
                         <p class="mt-6 text-slate-500 leading-relaxed text-sm border-t border-white/5 pt-6">
-                            L'infrastructure utilise des serveurs edge positionnés stratégiquement pour réduire la latence réseau. Notre moteur de calcul Quantum traite les requêtes parallèlement.
+                            L'infrastructure exploite une architecture Edge Computing. Chaque transaction est horodatée via un protocole de consensus à haute fréquence, rendant toute manipulation impossible.
                         </p>
                     </details>
                 </div>
@@ -239,55 +226,75 @@
             <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-16 mb-20">
                 <div class="max-w-sm">
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-bolt-lightning text-white"></i></div>
+                        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20"><i class="fa-solid fa-bolt-lightning text-white"></i></div>
                         <span class="text-2xl font-black text-white italic tracking-tighter">DropBid.</span>
                     </div>
-                    <p class="text-slate-500 text-sm leading-relaxed">Infrastructure logicielle de référence pour la nouvelle économie digitale. Performance et Transparence.</p>
+                    <p class="text-slate-500 text-sm leading-relaxed">Le standard industriel pour l'échange d'actifs numériques. Performance institutionnelle, fiabilité souveraine.</p>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-24">
+                <div class="grid grid-cols-2 gap-12 lg:gap-24">
                     <div>
-                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Réseau</h5>
+                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Écosystème</h5>
                         <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
-                            <li><a href="#" class="hover:text-white transition-colors">Marché Global</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Nodes Status</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">API Docs</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Légal</h5>
+                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Ressources</h5>
                         <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
                             <li><a href="#" class="hover:text-white transition-colors">Confidentialité</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Conformité</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">SOC-2 Compliance</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="border-t border-white/5 pt-12 text-center">
-                <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.5em]">© 2026 QUANTUM NETWORK OPERATIONS.</p>
+                <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.5em]">© 2026 QUANTUM NETWORK OPERATIONS. TOUS DROITS RÉSERVÉS.</p>
             </div>
         </footer>
     </main>
 
     <script>
-        // TOGGLE MENU MOBILE
+        // --- LOGIQUE MOBILE ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
+            const icon = document.getElementById('menu-icon');
+            
             sidebar.classList.toggle('open');
             overlay.classList.toggle('hidden');
+            
+            if (sidebar.classList.contains('open')) {
+                icon.classList.replace('fa-terminal', 'fa-xmark');
+            } else {
+                icon.classList.replace('fa-xmark', 'fa-terminal');
+            }
         }
 
-        // NAVIGATION ADAPTÉE (Mobile friendly)
+        // --- NAVIGATION ROBUSTE (PC & TEL) ---
         function handleNav(tab, event) {
-            // Appelle la logique de ton engine.js
+            // Appelle ta fonction principale de engine.js
             if (typeof switchTab === 'function') {
                 switchTab(tab, event);
             }
             
-            // Ferme le menu sur mobile après sélection
+            // Si on est sur mobile, on ferme le menu après le clic
             if (window.innerWidth < 1024) {
                 toggleSidebar();
             }
+
+            // Style visuel des boutons
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
+            event.currentTarget.classList.add('nav-active');
         }
+
+        // Sécurité pour l'affichage initial sur téléphone
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
+        });
     </script>
     <script src="engine.js" defer></script>
 </body>
