@@ -240,7 +240,6 @@ function executeLogin() {
 
 // Sécurité pour les anciens appels de fonctions
 const forceLogin = executeLogin;
-const executeLoginFromRegister = executeLogin;
 
 // --- UTILS : SOLDE & TOASTS ---
 function updateBalanceDisplay() {
@@ -320,6 +319,32 @@ setTimeout(forceAutoLogin, 500);
 
 // Lancer la connexion auto après 500ms (le temps que le DOM charge)
 setTimeout(forceAutoLogin, 500);
+
+window.executeLoginFromRegister = function(event) {
+        if (event) event.preventDefault();
+        
+        const btn = event.target.closest('button');
+        const originalContent = btn.innerHTML;
+        
+        // Effet de chargement "Quantum"
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Initialisation...';
+        
+        console.log("Tentative d'inscription au réseau...");
+
+        // Simulation de création de compte
+        setTimeout(() => {
+            // Animation de succès avant redirection
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Accès Créé';
+            btn.classList.add('border-emerald-500', 'text-emerald-400');
+            
+            setTimeout(() => {
+                // Redirection vers login.html qui est dans le même dossier
+                window.location.href = 'login.html';
+            }, 1000);
+        }, 1500);
+    }
+
 
 // --- INITIALISATION AU CHARGEMENT ---
 window.onload = () => {

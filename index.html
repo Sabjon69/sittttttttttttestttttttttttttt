@@ -3,299 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DropBid | L'Enchère Nouvelle Génération</title>
     
-    <title>DropBid QUANTUM V6 | Infrastructure Professionnelle</title>
-    
-    <meta name="description" content="Solution SaaS de grade industriel pour la gestion d'actifs digitaux.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #010409; color: #cbd5e1; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         
-        /* Glassmorphism Pro */
-        .glass-panel { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .nav-active { background: rgba(79, 70, 229, 0.15); border-left: 4px solid #4f46e5; color: white !important; }
-        
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #050505; 
+            color: #e2e8f0; 
+            overflow-x: hidden;
+        }
 
-        /* Mobile Sidebar Logic */
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+
+        .nav-active { border-left: 4px solid #6366f1; background: rgba(99, 102, 241, 0.1); color: white !important; }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .dot-live { animation: pulse-red 2s infinite; }
+
         @media (max-width: 1024px) {
-            #sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            #sidebar { transform: translateX(-100%); transition: 0.3s ease-in-out; }
             #sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0 !important; }
         }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="antialiased custom-scrollbar">
+<body class="antialiased">
 
-    <button onclick="toggleSidebar()" class="lg:hidden fixed bottom-6 right-6 z-[2000] w-14 h-14 bg-indigo-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl active:scale-90 transition-transform">
-        <i class="fa-solid fa-terminal" id="menu-icon"></i>
+    <button onclick="toggleSidebar()" class="lg:hidden fixed top-6 right-6 z-[1000] w-12 h-12 glass rounded-2xl flex items-center justify-center text-white border border-white/10">
+        <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
     </button>
 
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[950] hidden lg:hidden"></div>
-
-    <div id="toast-container" class="fixed top-6 right-6 z-[2000] flex flex-col gap-4 pointer-events-none"></div>
-
-    <section id="auth-modal" class="fixed inset-0 z-[1800] bg-black/95 backdrop-blur-2xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] p-8 lg:p-12 relative border border-white/10 shadow-2xl text-center">
-            <button onclick="closeAuthModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white transition-transform hover:rotate-90"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            <div class="w-20 h-20 bg-indigo-600/20 rounded-3xl flex items-center justify-center text-3xl text-indigo-500 mx-auto mb-8 border border-indigo-500/30">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-2 italic">Accès Terminal</h2>
-            <p class="text-slate-500 text-sm mb-10 font-mono italic">Établissement de la liaison sécurisée...</p>
-            
-            <form id="login-form" class="space-y-6 text-left" onsubmit="event.preventDefault();">
-                <div>
-                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 ml-2">Identifiant Opérateur</label>
-                    <input type="text" id="login-username" placeholder="ROOT_ID" class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 ml-2">Clé de sécurité</label>
-                    <input type="password" id="login-password" placeholder="••••••••" class="w-full bg-black/50 border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-indigo-500 transition-all">
-                </div>
-                <button type="submit" onclick="executeLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-white transition-all transform active:scale-95 shadow-xl shadow-indigo-600/20 uppercase tracking-widest">
-                    Initier la session
-                </button>
-            </form>
+<aside id="sidebar" class="fixed left-0 top-0 h-full w-20 lg:w-80 bg-[#050505] border-r border-white/[0.03] flex flex-col z-[1000] transition-all duration-300 shadow-2xl">
+    
+    <div class="p-6 lg:p-8 border-b border-white/[0.03] flex items-center gap-4 group cursor-pointer" onclick="window.location.href='index.html'">
+        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.3)] group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-infinity text-white text-xl lg:text-2xl"></i>
         </div>
-    </section>
-
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-80 bg-[#010409] border-r border-white/5 flex flex-col z-[1000]">
-        <div class="p-8 border-b border-white/5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-lg">
-                <i class="fa-solid fa-bolt-lightning text-white text-2xl"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl font-black text-white tracking-tighter uppercase italic">Drop<span class="text-indigo-500">Bid</span></h1>
-                <p class="text-[8px] text-slate-500 font-bold tracking-[0.3em] uppercase">Quantum Infrastructure</p>
-            </div>
+        <div class="hidden lg:block">
+            <h1 class="text-xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
+            <p class="text-[9px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Quantum Network</p>
         </div>
-
-        <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
-            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-4">Commandes</p>
-            
-            <button onclick="handleNav('home', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
-                <i class="fa-solid fa-layer-group w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="font-bold text-sm">Tableau de bord</span>
+    </div>
+    
+    <div class="p-4 lg:p-6 border-b border-white/[0.03]">
+        <div id="state-logged-out" class="flex flex-col gap-3">
+            <button onclick="window.location.href='sections/register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-user-plus text-xs"></i> 
+                <span class="hidden lg:inline">Créer un Accès</span>
             </button>
-
-            <button onclick="handleNav('live', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
-                <i class="fa-solid fa-chart-line w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="font-bold text-sm">Marché en Direct</span>
+            <button onclick="window.location.href='sections/login.html'" class="w-full bg-transparent border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-fingerprint text-xs"></i> 
+                <span class="hidden lg:inline">S'identifier</span>
             </button>
-
-            <button onclick="handleNav('admin', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
-                <i class="fa-solid fa-plus-circle w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="font-bold text-sm">Nouvelle Enchère</span>
-            </button>
-
-            <button onclick="handleNav('inventory', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
-                <i class="fa-solid fa-box-archive w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="font-bold text-sm">Gestion des Actifs</span>
-            </button>
-
-            <div class="h-px bg-white/5 my-6 mx-4"></div>
-
-            <button onclick="handleNav('guide', event)" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/[0.03] transition-all group text-left">
-                <i class="fa-solid fa-book w-6 text-xl group-hover:text-indigo-400"></i> 
-                <span class="font-bold text-sm">Documentation API</span>
-            </button>
-        </nav>
-
-        <div class="p-6 border-t border-white/5 bg-black/20 flex items-center gap-3">
-            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest italic">Node Active: Primary</span>
         </div>
-    </aside>
+    </div>
 
-    <main class="main-content lg:ml-80 min-h-screen transition-all">
+    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+        <p class="hidden lg:block text-[8px] text-slate-600 font-black uppercase tracking-[0.3em] px-4 mb-4 italic">Menu</p>
         
-        <header class="sticky top-0 z-[500] bg-[#010409]/80 backdrop-blur-md border-b border-white/5 p-6 lg:p-12 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
-            <div>
-                <h1 id="view-title" class="text-4xl lg:text-7xl font-black text-white uppercase tracking-tighter italic leading-none">TERMINAL</h1>
-                <p id="view-subtitle" class="text-indigo-500 text-xs font-bold tracking-[0.2em] uppercase mt-2">v6.1.4 • Monitoring Flux Haute Vélocité</p>
+        <button onclick="window.location.href='index.html'" class="nav-active w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-white transition-all group">
+            <i class="fa-solid fa-house w-6 text-lg"></i> 
+            <span class="hidden lg:block font-bold text-sm">Accueil</span>
+        </button>
+
+        <button onclick="window.location.href='sections/live.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
+            <i class="fa-solid fa-chart-line w-6 text-lg group-hover:text-indigo-400"></i> 
+            <span class="hidden lg:block font-bold text-sm">Marché Live</span>
+        </button>
+
+        <button onclick="window.location.href='sections/admin.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
+            <i class="fa-solid fa-tag w-6 text-lg group-hover:text-indigo-400"></i> 
+            <span class="hidden lg:block font-bold text-sm">Déposer une offre</span>
+        </button>
+
+        <button onclick="window.location.href='sections/inventory.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
+            <i class="fa-solid fa-box-open w-6 text-lg group-hover:text-indigo-400"></i> 
+            <span class="hidden lg:block font-bold text-sm">Mon Inventaire</span>
+        </button>
+
+        <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+
+        <button onclick="window.location.href='sections/guide.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
+            <i class="fa-solid fa-circle-info w-6 text-lg group-hover:text-indigo-400"></i> 
+            <span class="hidden lg:block font-bold text-sm">Aide</span>
+        </button>
+    </nav>
+</aside>
+
+    <main class="main-content lg:ml-80 min-h-screen">
+        
+        <header class="p-8 lg:p-16 space-y-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-500 dot-live"></span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Marché Ouvert 24/7</span>
             </div>
-            <div class="bg-indigo-600/10 border border-indigo-500/20 px-6 py-3 rounded-2xl hidden sm:block">
-                <p class="text-[9px] text-slate-500 font-black uppercase">Statut Système</p>
-                <p class="text-indigo-400 font-mono font-bold uppercase text-xs">OPTIMAL [14ms]</p>
-            </div>
+            <h1 class="text-4xl lg:text-7xl font-extrabold text-white tracking-tighter leading-tight italic uppercase">
+                Gagnez sur <br><span class="text-indigo-500 underline decoration-white/10 italic">chaque seconde.</span>
+            </h1>
+            <p class="text-slate-400 max-w-xl text-sm lg:text-base">
+                La seule plateforme où le prix des objets rares ne baisse jamais. Soyez le plus rapide pour valider votre acquisition au meilleur prix.
+            </p>
         </header>
 
-        <div class="p-6 lg:p-16 max-w-7xl mx-auto">
-            
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-                
-                <div class="glass-panel p-8 rounded-[2.5rem] border-l-4 border-l-indigo-500 relative overflow-hidden group">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Liquidité Injectée (24h)</p>
-                    <div class="flex items-baseline gap-2 mb-2">
-                        <h3 id="stat-volume" class="text-4xl font-black text-white tracking-tighter italic">1.24M</h3>
-                        <span class="text-indigo-500 font-bold text-xl font-mono">€</span>
-                    </div>
-                    <p class="text-[9px] text-emerald-500 font-bold uppercase flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Flux de Trésorerie Actif
-                    </p>
+        <div class="px-8 lg:px-16 pb-20 space-y-32">
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass p-8 rounded-[2.5rem] border-l-4 border-indigo-500">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Argent en circulation</p>
+                    <h3 class="text-3xl font-extrabold text-white tracking-tight">1 240 101 €</h3>
                 </div>
-
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Instances de Calcul</p>
-                    <div class="flex items-baseline gap-2 mb-2">
-                        <h3 id="stat-nodes" class="text-4xl font-black text-white tracking-tighter">14</h3>
-                        <span class="text-slate-500 font-bold text-sm uppercase">Clusters</span>
-                    </div>
-                    <div class="w-full bg-white/5 h-[2px] mt-4 overflow-hidden">
-                        <div class="bg-indigo-500 h-full w-2/3 shadow-[0_0_10px_#4f46e5]"></div>
-                    </div>
+                <div class="glass p-8 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Vitesse du prix</p>
+                    <h3 class="text-3xl font-extrabold text-white tracking-tight">+0.85 € /s</h3>
                 </div>
-
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Temps de Réponse (RTT)</p>
-                    <div class="flex items-baseline gap-2 mb-2">
-                        <h3 id="stat-latency" class="text-4xl font-black text-white tracking-tighter italic">14</h3>
-                        <span class="text-emerald-500 font-bold text-xs uppercase">μs</span>
-                    </div>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase italic">Latence Intra-Cluster: <span class="text-white">NOMINAL</span></p>
-                </div>
-
-                <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group border-b-4 border-b-amber-500/20">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Disponibilité (SLA)</p>
-                    <div class="flex items-baseline gap-2 mb-2">
-                        <h3 id="stat-reliability" class="text-4xl font-black text-white tracking-tighter tabular-nums">99.99</h3>
-                        <span class="text-amber-500 font-bold text-xl font-mono">%</span>
-                    </div>
-                    <p class="text-[9px] text-amber-500 font-black uppercase italic tracking-tighter">Grade Institutionnel</p>
-                </div>
-
-            </section>
-
-            <div id="app-content" class="min-h-[400px]">
-                <div class="flex flex-col items-center justify-center h-full text-center py-20">
-                    <i class="fa-solid fa-spinner fa-spin text-4xl text-indigo-500 mb-6"></i>
-                    <p class="text-slate-500 font-mono italic">Synchronisation avec le noyau DropBid...</p>
-                </div>
-            </div>
-
-            <section class="mt-40 border-t border-white/5 pt-20">
-                <div class="text-center mb-20 px-4">
-                    <h2 class="text-3xl lg:text-6xl font-black text-white uppercase tracking-tighter mb-6 italic">Ingénierie <span class="text-indigo-500">DropBid</span></h2>
-                    <p class="text-slate-500 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed font-medium">Une infrastructure propriétaire conçue pour les opérateurs exigeants où chaque milliseconde compte.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-4">
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-indigo-600/10 rounded-3xl flex items-center justify-center text-2xl text-indigo-500 border border-indigo-500/20"><i class="fa-solid fa-microchip"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Moteur Quantum</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Traitement parallélisé des ordres d'enchères. Zéro latence de calcul pour une exécution chirurgicale des transactions.</p>
-                    </article>
-
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-emerald-600/10 rounded-3xl flex items-center justify-center text-2xl text-emerald-500 border border-emerald-500/20"><i class="fa-solid fa-shield-halved"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Chiffrement AES-512</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Sécurité de grade souverain. Chaque actif est verrouillé par un protocole multi-signature auditable en temps réel.</p>
-                    </article>
-
-                    <article class="space-y-6">
-                        <div class="w-16 h-16 bg-amber-600/10 rounded-3xl flex items-center justify-center text-2xl text-amber-500 border border-amber-500/20"><i class="fa-solid fa-headset"></i></div>
-                        <h4 class="text-2xl font-black text-white uppercase tracking-tight italic">Support Critique</h4>
-                        <p class="text-slate-500 leading-relaxed text-sm">Ligne directe avec nos ingénieurs système 24/7/365. Nous garantissons une stabilité totale de vos flux stratégiques.</p>
-                    </article>
+                <div class="glass p-8 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Utilisateurs actifs</p>
+                    <h3 class="text-3xl font-extrabold text-white tracking-tight">1 402</h3>
                 </div>
             </section>
 
-            <section class="mt-40 max-w-4xl mx-auto px-4">
-                <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-12 text-center italic">Compliance & Protocole</h2>
-                <div class="space-y-4">
-                    <details class="glass-panel rounded-3xl p-6 lg:p-8 group cursor-pointer border border-white/5 hover:border-indigo-500/30 transition-all">
-                        <summary class="list-none flex justify-between items-center font-bold text-white uppercase tracking-widest text-xs lg:text-sm">
-                            Comment DropBid garantit-il l'intégrité des enchères ?
-                            <span class="text-indigo-500 group-open:rotate-180 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
-                        </summary>
-                        <p class="mt-6 text-slate-500 leading-relaxed text-sm border-t border-white/5 pt-6">
-                            L'infrastructure exploite une architecture Edge Computing. Chaque transaction est horodatée via un protocole de consensus à haute fréquence, rendant toute manipulation impossible.
-                        </p>
-                    </details>
+            <section class="space-y-16">
+                <div class="text-center">
+                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Comment ça marche ?</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">1</div>
+                        <h4 class="text-xl font-bold text-white uppercase">Accès</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Déposez une garantie pour participer.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">2</div>
+                        <h4 class="text-xl font-bold text-white uppercase">Live</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Le prix monte. Cliquez en premier.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">3</div>
+                        <h4 class="text-xl font-bold text-white uppercase">Win</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Récupérez votre item ou votre dépôt.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="space-y-8">
+                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Dernières ventes</h2>
+                    <div id="activity-feed" class="space-y-3"></div>
+                </div>
+                <div class="space-y-8">
+                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Le plus recherché</h2>
+                    <div id="featured-assets" class="grid grid-cols-1 gap-4"></div>
                 </div>
             </section>
         </div>
 
-        <footer class="mt-40 bg-black/60 border-t border-white/5 p-12 lg:p-24">
-            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-16 mb-20">
-                <div class="max-w-sm">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20"><i class="fa-solid fa-bolt-lightning text-white"></i></div>
-                        <span class="text-2xl font-black text-white italic tracking-tighter">DropBid.</span>
-                    </div>
-                    <p class="text-slate-500 text-sm leading-relaxed">Le standard industriel pour l'échange d'actifs numériques. Performance institutionnelle, fiabilité souveraine.</p>
-                </div>
-                <div class="grid grid-cols-2 gap-12 lg:gap-24">
-                    <div>
-                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Écosystème</h5>
-                        <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
-                            <li><a href="#" class="hover:text-white transition-colors">Nodes Status</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">API Docs</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h5 class="text-white font-black uppercase text-xs tracking-widest mb-6">Ressources</h5>
-                        <ul class="space-y-4 text-[10px] font-bold text-slate-500 uppercase">
-                            <li><a href="#" class="hover:text-white transition-colors">Confidentialité</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">SOC-2 Compliance</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-white/5 pt-12 text-center">
-                <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.5em]">© 2026 QUANTUM NETWORK OPERATIONS. TOUS DROITS RÉSERVÉS.</p>
-            </div>
+        <footer class="p-12 border-t border-white/5 text-center text-slate-600">
+            <p class="text-[10px] font-bold uppercase tracking-[0.5em] italic italic">© 2026 DROPBID NETWORK.</p>
         </footer>
     </main>
 
     <script>
-        // --- LOGIQUE MOBILE ---
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const icon = document.getElementById('menu-icon');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('hidden');
-            
-            if (sidebar.classList.contains('open')) {
-                icon.classList.replace('fa-terminal', 'fa-xmark');
-            } else {
-                icon.classList.replace('fa-xmark', 'fa-terminal');
-            }
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('open');
         }
 
-        // --- NAVIGATION ROBUSTE (PC & TEL) ---
-        function handleNav(tab, event) {
-            // Appelle ta fonction principale de engine.js
-            if (typeof switchTab === 'function') {
-                switchTab(tab, event);
-            }
-            
-            // Si on est sur mobile, on ferme le menu après le clic
-            if (window.innerWidth < 1024) {
-                toggleSidebar();
-            }
-
-            // Style visuel des boutons
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
-            event.currentTarget.classList.add('nav-active');
+        const activityContainer = document.getElementById('activity-feed');
+        function addTrade(name, price) {
+            const entry = document.createElement('div');
+            entry.className = "glass p-4 rounded-2xl flex items-center justify-between border-l-2 border-emerald-500";
+            entry.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[10px] text-emerald-500 font-bold uppercase">WIN</div>
+                    <div>
+                        <p class="text-[11px] font-bold text-white uppercase">${name}</p>
+                        <p class="text-[9px] text-slate-500 uppercase">${price}€</p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='sections/live.html'" class="w-8 h-8 glass rounded-full flex items-center justify-center text-xs text-indigo-400"><i class="fa-solid fa-eye"></i></button>
+            `;
+            activityContainer.prepend(entry);
+            if (activityContainer.children.length > 5) activityContainer.lastElementChild.remove();
         }
 
-        // Sécurité pour l'affichage initial sur téléphone
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebar-overlay').classList.add('hidden');
-            }
-        });
+        setInterval(() => {
+            const items = ["Rolex", "Bitcoin", "Or 24k", "Diamant"];
+            addTrade(items[Math.floor(Math.random() * items.length)], (Math.random() * 5000).toFixed(2));
+        }, 3000);
+
+        const products = [
+            { name: "Rolex Daytona", buyers: 1240, img: "fa-gem", color: "text-indigo-500" },
+            { name: "Lot 10 ETH", buyers: 2150, img: "fa-coins", color: "text-blue-500" }
+        ];
+
+        function renderFeatured() {
+            document.getElementById('featured-assets').innerHTML = products.map(p => `
+                <div class="glass p-6 rounded-3xl flex items-center justify-between group">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl ${p.color}"><i class="fa-solid ${p.img}"></i></div>
+                        <div><h5 class="text-white font-black uppercase italic">${p.name}</h5><p class="text-[10px] text-slate-500 font-bold uppercase">${p.buyers} VUES</p></div>
+                    </div>
+                    <button onclick="window.location.href='sections/live.html'" class="bg-indigo-600 text-white text-[10px] font-black px-6 py-3 rounded-xl uppercase tracking-widest">Rejoindre</button>
+                </div>
+            `).join('');
+        }
+        renderFeatured();
     </script>
-    <script src="engine.js" defer></script>
 </body>
 </html>

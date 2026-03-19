@@ -2,121 +2,195 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropBid | Quantum Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Effet de grille de fond (Dots) */
-        .bg-dots {
-            background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500;800&display=swap');
         
-        /* Animation de scan progressif */
-        .scan-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, #6366f1, transparent);
-            position: absolute;
-            animation: scanning 3s infinite linear;
-        }
-        @keyframes scanning {
-            0% { left: -100%; width: 30%; }
-            100% { left: 100%; width: 50%; }
-        }
+        :root { --p: #6366f1; --bg: #050505; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; }
+        
+        /* Effet de scan constant sur le formulaire */
+        .scanner { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(99, 102, 241, 0.05) 50%); background-size: 100% 4px; pointer-events: none; }
+        .scan-bar { width: 100%; height: 2px; background: var(--p); position: absolute; box-shadow: 0 0 15px var(--p); animation: move 4s infinite linear; z-index: 50; }
+        @keyframes move { 0% { top: 0%; } 100% { top: 100%; } }
 
-        .quantum-card {
-            position: relative;
-            background: rgba(1, 4, 9, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        .quantum-card { background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.02); color: white; }
+        .active-tab { border-right: 3px solid var(--p); background: rgba(99, 102, 241, 0.05); color: white !important; }
+
+        /* Scrollbar invisible */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        input, select { background: #000 !important; border: 1px solid #222 !important; color: white !important; transition: 0.3s; }
+        input:focus { border-color: var(--p) !important; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
     </style>
 </head>
-<body class="bg-transparent">
-    <div class="animate-view-enter max-w-xl mx-auto mt-12 px-4 pb-20">
+<body class="min-h-screen flex">
+
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-20 lg:w-80 bg-[#050505] border-r border-white/[0.03] flex flex-col z-[1000] transition-all">
         
-        <div class="quantum-card rounded-[3.5rem] p-1 shadow-2xl overflow-hidden">
-            
-            <div class="absolute inset-0 bg-dots opacity-40 pointer-events-none"></div>
-            
-            <div class="relative glass-panel p-10 lg:p-12 rounded-[3.4rem] bg-[#010409]/90 backdrop-blur-3xl z-10">
-                
-                <div class="flex flex-col items-center mb-12">
-                    <div class="relative mb-6">
-                        <div class="absolute -inset-4 border border-indigo-500/20 rounded-full animate-spin [animation-duration:8s]"></div>
-                        <div class="absolute -inset-2 border border-dashed border-indigo-500/10 rounded-full animate-spin [animation-duration:4s] direction-reverse"></div>
-                        
-                        <div class="w-24 h-24 bg-gradient-to-br from-indigo-900/50 to-slate-900 rounded-[2rem] flex items-center justify-center border border-indigo-500/30 shadow-[0_0_50px_rgba(79,70,229,0.15)] relative z-10">
-                            <i class="fa-solid fa-user-plus text-4xl text-indigo-400"></i>
-                        </div>
-                    </div>
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] flex items-center gap-4 group">
+            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-infinity text-white text-2xl"></i>
+            </div>
+            <div class="hidden lg:block">
+                <h1 class="text-xl font-black text-white uppercase tracking-tighter">Drop<span class="text-indigo-500">Bid</span></h1>
+                <p class="text-[9px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Quantum Network</p>
+            </div>
+        </div>
+        
+        <div class="p-4 lg:p-6 border-b border-white/[0.03]">
+            <div id="state-logged-out" class="flex flex-col gap-3">
+                <button onclick="showTab('audit')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> <span class="hidden lg:inline">Créer un Accès</span>
+                </button>
+                <button class="w-full border border-white/10 text-slate-400 p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-fingerprint"></i> <span class="hidden lg:inline">S'identifier</span>
+                </button>
+            </div>
 
-                    <h2 class="text-4xl font-black text-white uppercase tracking-tighter italic leading-none text-center">
-                        Initialize <span class="text-indigo-500">Access</span>
-                    </h2>
-                    
-                    <div class="flex items-center gap-4 mt-4 overflow-hidden w-full max-w-[200px] h-1 bg-slate-800/50 rounded-full relative">
-                        <div class="scan-bar"></div>
+            <div id="state-logged-in" class="hidden flex flex-col gap-4">
+                <div class="flex items-center gap-3 p-2">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#050505] rounded-full animate-pulse"></div>
                     </div>
-                    <p class="text-[8px] text-indigo-500/50 font-black uppercase tracking-[0.4em] mt-3">Quantum Protocol Setup</p>
+                    <div class="hidden lg:block">
+                        <p class="text-white font-bold text-sm tracking-tight">Opérateur-01</p>
+                        <p class="text-[8px] text-indigo-500 font-black uppercase tracking-widest italic">Liaison Établie</p>
+                    </div>
                 </div>
-
-                <div class="space-y-8">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="group">
-                            <label class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] ml-2 mb-2 block group-focus-within:text-indigo-400 transition-colors">Forename</label>
-                            <input type="text" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm placeholder:text-slate-800" placeholder="John">
-                        </div>
-                        <div class="group">
-                            <label class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] ml-2 mb-2 block group-focus-within:text-indigo-400 transition-colors">Surname</label>
-                            <input type="text" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm placeholder:text-slate-800" placeholder="Doe">
-                        </div>
-                    </div>
-
-                    <div class="group">
-                        <div class="flex justify-between items-center px-2 mb-2">
-                            <label class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] group-focus-within:text-indigo-400">Network ID</label>
-                           <span id="user-check" class="text-[8px] text-slate-700 font-mono uppercase tracking-tighter transition-colors">Vérification ID...</span>
-                        </div>
-                        <div class="relative">
-                            <div class="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-500/50">
-                                <i class="fa-solid fa-at text-xs"></i>
-                            </div>
-                            <input type="text" id="register-username" 
-                                class="w-full bg-black/60 border border-white/5 rounded-2xl py-5 pl-12 pr-6 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono text-sm" 
-                                placeholder="operator_identity">
-                        </div>
-                    </div>
-
-                    <div class="pt-6">
-                        <button onclick="executeLoginFromRegister()" 
-                            class="group relative w-full h-20 overflow-hidden rounded-[2rem] bg-white text-black font-black uppercase text-xs tracking-[0.4em] transition-all hover:tracking-[0.6em] active:scale-[0.98] shadow-2xl">
-                            <div class="absolute inset-0 bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
-                            
-                            <span class="relative z-10 flex items-center justify-center gap-3 group-hover:text-white transition-colors duration-500">
-                                Confirm Credentials
-                                <i class="fa-solid fa-arrow-right-long animate-pulse"></i>
-                            </span>
-                        </button>
-                    </div>
-
-                    <div class="flex flex-col items-center gap-6 mt-10">
-                        <div class="flex items-center gap-3">
-                            <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
-                            <span class="w-1.5 h-1.5 bg-indigo-500/30 rounded-full"></span>
-                            <span class="w-1.5 h-1.5 bg-indigo-500/30 rounded-full"></span>
-                        </div>
-                        
-                        <p class="text-[9px] text-slate-500 text-center leading-relaxed max-w-xs uppercase tracking-widest font-bold">
-                            By deploying, you agree to the <span class="text-white">Quantum Privacy layers</span> and data encryption laws.
-                        </p>
-                        
-                        <button onclick="switchTab('login', event)" class="text-xs text-indigo-400 hover:text-white font-black uppercase tracking-tighter transition-all hover:underline decoration-2 underline-offset-8">
-                            Already have access ?
-                        </button>
-                    </div>
+                <div class="bg-indigo-500/[0.03] p-4 rounded-2xl border border-white/[0.05] hidden lg:block backdrop-blur-md">
+                    <p class="text-[8px] text-slate-500 uppercase font-black tracking-widest mb-1">Garantie</p>
+                    <p class="font-bold text-white text-xl tracking-tighter">0.00 €</p>
                 </div>
             </div>
         </div>
-    </div>
+
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+            <p class="hidden lg:block text-[8px] text-slate-600 font-black uppercase tracking-[0.3em] px-4 mb-4 italic">Menu</p>
+            
+            <button onclick="showTab('home')" class="nav-item active-tab w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 transition-all">
+                <i class="fa-solid fa-house w-6 text-lg"></i> <span class="hidden lg:block font-bold text-sm">Accueil</span>
+            </button>
+
+            <button onclick="showTab('market')" class="nav-item w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 transition-all">
+                <i class="fa-solid fa-chart-line w-6 text-lg"></i> <span class="hidden lg:block font-bold text-sm">Marché Live</span>
+            </button>
+
+            <button onclick="showTab('offer')" class="nav-item w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 transition-all">
+                <i class="fa-solid fa-tag w-6 text-lg"></i> <span class="hidden lg:block font-bold text-sm">Déposer une offre</span>
+            </button>
+
+            <button onclick="showTab('inventory')" class="nav-item w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 transition-all">
+                <i class="fa-solid fa-box-open w-6 text-lg"></i> <span class="hidden lg:block font-bold text-sm">Mon Inventaire</span>
+            </button>
+
+            <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+
+            <button onclick="showTab('help')" class="nav-item w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 transition-all">
+                <i class="fa-solid fa-circle-info w-6 text-lg"></i> <span class="hidden lg:block font-bold text-sm">Aide</span>
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 ml-20 lg:ml-80 p-6 lg:p-12 flex justify-center items-start">
+        
+        <div class="w-full max-w-5xl">
+
+            <div id="tab-audit" class="tab-content">
+                <div class="quantum-card rounded-[3.5rem] overflow-hidden relative shadow-2xl border border-white/5">
+                    <div class="scan-bar"></div>
+                    <div class="scanner"></div>
+
+                    <div class="p-8 md:p-16 lg:p-20 relative z-10">
+                        <div class="flex items-center justify-between mb-12 pb-8 border-b border-white/5">
+                            <div>
+                                <h2 class="text-4xl font-black uppercase tracking-tighter italic">Identity <span class="text-indigo-500">Audit</span></h2>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-2">Protocol de vérification niveau 4</p>
+                            </div>
+                            <i class="fa-solid fa-shield-virus text-4xl text-indigo-500/20"></i>
+                        </div>
+
+                        <form class="space-y-12">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">01. État Civil</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <input type="text" placeholder="NOM" class="p-5 rounded-2xl w-full text-sm font-bold uppercase">
+                                        <input type="text" placeholder="PRÉNOM" class="p-5 rounded-2xl w-full text-sm font-bold">
+                                    </div>
+                                    <input type="date" class="p-5 rounded-2xl w-full text-sm font-mono">
+                                </div>
+                                <div class="space-y-6">
+                                    <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">02. Localisation</h3>
+                                    <input type="text" placeholder="ADRESSE PHYSIQUE" class="p-5 rounded-2xl w-full text-sm">
+                                    <input type="tel" placeholder="+33 _ __ __ __ __" class="p-5 rounded-2xl w-full text-sm font-mono">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-white/5">
+                                <div class="h-48 bg-black rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
+                                    <i class="fa-solid fa-id-card text-3xl text-slate-700 group-hover:text-indigo-500"></i>
+                                    <p class="text-[8px] font-black mt-4 text-slate-600 uppercase">Pièce d'identité</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
+                                <div class="h-48 bg-black rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
+                                    <i class="fa-solid fa-face-viewfinder text-3xl text-slate-700 group-hover:text-indigo-500"></i>
+                                    <p class="text-[8px] font-black mt-4 text-slate-600 uppercase">Scan Facial Live</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
+                                <div class="h-48 bg-black rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
+                                    <i class="fa-solid fa-file-invoice text-3xl text-slate-700 group-hover:text-indigo-500"></i>
+                                    <p class="text-[8px] font-black mt-4 text-slate-600 uppercase">Justificatif Domicile</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="validateAudit()" class="w-full h-24 bg-white text-black font-black uppercase text-sm tracking-[0.5em] rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl">
+                                Synchroniser Profil
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-home" class="tab-content hidden">
+                <h2 class="text-4xl font-black mb-10 italic uppercase">Terminal <span class="text-indigo-500">Flux</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="quantum-card p-8 rounded-[2.5rem]">
+                        <p class="text-[10px] text-indigo-500 font-black mb-2 uppercase">Réseau</p>
+                        <p class="text-2xl font-black uppercase tracking-tighter text-white">Actif</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function showTab(id) {
+            // Cacher tous les contenus
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            // Retirer le style "active" des boutons
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active-tab'));
+            
+            // Afficher le bon
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            // Mettre le bouton en surbrillance (trouver le bouton via l'id)
+            event.currentTarget.classList.add('active-tab');
+        }
+
+        function validateAudit() {
+            alert("Audit envoyé au réseau DropBid !");
+            document.getElementById('state-logged-out').classList.add('hidden');
+            document.getElementById('state-logged-in').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
