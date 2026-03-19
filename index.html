@@ -2,8 +2,8 @@
 <html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DropBid | L'Enchère Nouvelle Génération</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropBid | Terminal Enchères Quantum</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,18 +13,62 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #050505; 
+            background-color: #020202; 
             color: #e2e8f0; 
-            overflow-x: hidden;
+            margin: 0;
+            display: flex;
+            min-h-screen;
+        }
+
+        /* Arrière-plan Tech Grid */
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
         }
 
         .glass { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
         }
 
-        .nav-active { border-left: 4px solid #6366f1; background: rgba(99, 102, 241, 0.1); color: white !important; }
+        .sidebar-fixed {
+            width: 320px;
+            height: 100vh;
+            background: #050505;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .main-container {
+            margin-left: 320px;
+            width: calc(100% - 320px);
+            padding: 0;
+        }
+
+        .nav-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            padding-left: 2rem;
+        }
+
+        .nav-active {
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 4px solid #6366f1;
+            color: white !important;
+        }
 
         @keyframes pulse-red {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
@@ -33,194 +77,249 @@
         }
         .dot-live { animation: pulse-red 2s infinite; }
 
-        @media (max-width: 1024px) {
-            #sidebar { transform: translateX(-100%); transition: 0.3s ease-in-out; }
-            #sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; }
-        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Layout Grid pour les Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .hover-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
+            transition: all 0.3s;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <button onclick="toggleSidebar()" class="lg:hidden fixed top-6 right-6 z-[1000] w-12 h-12 glass rounded-2xl flex items-center justify-center text-white border border-white/10">
-        <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
-    </button>
+    <div class="bg-grid"></div>
 
-<aside id="sidebar" class="fixed left-0 top-0 h-full w-20 lg:w-80 bg-[#050505] border-r border-white/[0.03] flex flex-col z-[1000] transition-all duration-300 shadow-2xl">
-    
-    <div class="p-6 lg:p-8 border-b border-white/[0.03] flex items-center gap-4 group cursor-pointer" onclick="window.location.href='index.html'">
-        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.3)] group-hover:scale-105 transition-transform">
-            <i class="fa-solid fa-infinity text-white text-xl lg:text-2xl"></i>
-        </div>
-        <div class="hidden lg:block">
-            <h1 class="text-xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
-            <p class="text-[9px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Quantum Network</p>
-        </div>
-    </div>
-    
-    <div class="p-4 lg:p-6 border-b border-white/[0.03]">
-        <div id="state-logged-out" class="flex flex-col gap-3">
-            <button onclick="window.location.href='sections/register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-indigo-500/20">
-                <i class="fa-solid fa-user-plus text-xs"></i> 
-                <span class="hidden lg:inline">Créer un Accès</span>
-            </button>
-            <button onclick="window.location.href='sections/login.html'" class="w-full bg-transparent border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white p-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-fingerprint text-xs"></i> 
-                <span class="hidden lg:inline">S'identifier</span>
-            </button>
-        </div>
-    </div>
-
-    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
-        <p class="hidden lg:block text-[8px] text-slate-600 font-black uppercase tracking-[0.3em] px-4 mb-4 italic">Menu</p>
+    <aside class="sidebar-fixed">
         
-        <button onclick="window.location.href='index.html'" class="nav-active w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-white transition-all group">
-            <i class="fa-solid fa-house w-6 text-lg"></i> 
-            <span class="hidden lg:block font-bold text-sm">Accueil</span>
-        </button>
-
-        <button onclick="window.location.href='sections/live.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
-            <i class="fa-solid fa-chart-line w-6 text-lg group-hover:text-indigo-400"></i> 
-            <span class="hidden lg:block font-bold text-sm">Marché Live</span>
-        </button>
-
-        <button onclick="window.location.href='sections/admin.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
-            <i class="fa-solid fa-tag w-6 text-lg group-hover:text-indigo-400"></i> 
-            <span class="hidden lg:block font-bold text-sm">Déposer une offre</span>
-        </button>
-
-        <button onclick="window.location.href='sections/inventory.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
-            <i class="fa-solid fa-box-open w-6 text-lg group-hover:text-indigo-400"></i> 
-            <span class="hidden lg:block font-bold text-sm">Mon Inventaire</span>
-        </button>
-
-        <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
-
-        <button onclick="window.location.href='sections/guide.html'" class="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl text-slate-500 hover:text-white hover:bg-white/[0.02] transition-all group">
-            <i class="fa-solid fa-circle-info w-6 text-lg group-hover:text-indigo-400"></i> 
-            <span class="hidden lg:block font-bold text-sm">Aide</span>
-        </button>
-    </nav>
-</aside>
-
-    <main class="main-content lg:ml-80 min-h-screen">
-        
-        <header class="p-8 lg:p-16 space-y-4">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-red-500 dot-live"></span>
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Marché Ouvert 24/7</span>
+        <div class="p-10 border-b border-white/[0.03]">
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.3)] group-hover:rotate-12 transition-transform">
+                    <i class="fa-solid fa-infinity text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-2 italic">Quantum v2.0</p>
+                </div>
             </div>
-            <h1 class="text-4xl lg:text-7xl font-extrabold text-white tracking-tighter leading-tight italic uppercase">
-                Gagnez sur <br><span class="text-indigo-500 underline decoration-white/10 italic">chaque seconde.</span>
+        </div>
+        
+        <div class="p-8 border-b border-white/[0.03] space-y-4">
+            <button onclick="window.location.href='sections/register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-user-plus"></i> Créer un Accès
+            </button>
+            <button onclick="window.location.href='sections/login.html'" class="w-full bg-white/5 border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+                <i class="fa-solid fa-fingerprint"></i> S'identifier
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto no-scrollbar">
+            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-6 mb-6">Menu Terminal</p>
+            
+            <button onclick="window.location.href='index.html'" class="nav-item nav-active w-full flex items-center gap-5 p-5 rounded-2xl text-slate-400">
+                <i class="fa-solid fa-house text-xl"></i> 
+                <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
+            </button>
+
+            <button onclick="window.location.href='sections/live.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
+                <i class="fa-solid fa-chart-line text-xl"></i> 
+                <span class="font-bold text-sm tracking-wide">Marché Live</span>
+            </button>
+
+            <button onclick="window.location.href='sections/admin.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
+                <i class="fa-solid fa-tag text-xl"></i> 
+                <span class="font-bold text-sm tracking-wide">Déposer une offre</span>
+            </button>
+
+            <button onclick="window.location.href='sections/inventory.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
+                <i class="fa-solid fa-box-open text-xl"></i> 
+                <span class="font-bold text-sm tracking-wide">Mon Inventaire</span>
+            </button>
+
+            <div class="h-px bg-white/[0.03] my-8 mx-6"></div>
+
+            <button onclick="window.location.href='sections/guide.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
+                <i class="fa-solid fa-circle-info text-xl"></i> 
+                <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
+            </button>
+        </nav>
+
+        <div class="p-8 bg-black/40 border-t border-white/[0.03]">
+            <div class="flex items-center gap-4">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        
+        <header class="p-20 space-y-6">
+            <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full bg-red-500 dot-live"></span>
+                <span class="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">Network Live Status</span>
+            </div>
+            <h1 class="text-8xl font-black text-white tracking-tighter leading-[0.9] italic uppercase">
+                Gagnez sur <br><span class="text-indigo-600 underline decoration-white/5 not-italic">chaque seconde.</span>
             </h1>
-            <p class="text-slate-400 max-w-xl text-sm lg:text-base">
-                La seule plateforme où le prix des objets rares ne baisse jamais. Soyez le plus rapide pour valider votre acquisition au meilleur prix.
+            <p class="text-slate-500 max-w-2xl text-lg font-medium leading-relaxed">
+                Terminal de trading haute fréquence pour actifs rares. Le prix grimpe en temps réel, la réactivité est votre seule arme.
             </p>
         </header>
 
-        <div class="px-8 lg:px-16 pb-20 space-y-32">
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-8 rounded-[2.5rem] border-l-4 border-indigo-500">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Argent en circulation</p>
-                    <h3 class="text-3xl font-extrabold text-white tracking-tight">1 240 101 €</h3>
-                </div>
-                <div class="glass p-8 rounded-[2.5rem]">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Vitesse du prix</p>
-                    <h3 class="text-3xl font-extrabold text-white tracking-tight">+0.85 € /s</h3>
-                </div>
-                <div class="glass p-8 rounded-[2.5rem]">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Utilisateurs actifs</p>
-                    <h3 class="text-3xl font-extrabold text-white tracking-tight">1 402</h3>
-                </div>
-            </section>
-
-            <section class="space-y-16">
-                <div class="text-center">
-                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Comment ça marche ?</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
-                    <div class="space-y-4">
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">1</div>
-                        <h4 class="text-xl font-bold text-white uppercase">Accès</h4>
-                        <p class="text-sm text-slate-400 leading-relaxed">Déposez une garantie pour participer.</p>
+        <div class="px-20 pb-32 space-y-32">
+            
+            <section class="stats-grid">
+                <div class="glass p-10 rounded-[3rem] border-l-4 border-indigo-600 hover-card">
+                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Volume Global</p>
+                    <h3 class="text-5xl font-black text-white tracking-tighter italic">1 240 101 €</h3>
+                    <div class="mt-4 flex items-center gap-2 text-emerald-500">
+                        <i class="fa-solid fa-caret-up"></i>
+                        <span class="text-xs font-bold uppercase">Flux sécurisé</span>
                     </div>
-                    <div class="space-y-4">
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">2</div>
-                        <h4 class="text-xl font-bold text-white uppercase">Live</h4>
-                        <p class="text-sm text-slate-400 leading-relaxed">Le prix monte. Cliquez en premier.</p>
+                </div>
+                <div class="glass p-10 rounded-[3rem] hover-card">
+                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Vitesse Incrément</p>
+                    <h3 class="text-5xl font-black text-white tracking-tighter italic">+0.85 €/s</h3>
+                    <div class="mt-4 flex items-center gap-2 text-indigo-500">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span class="text-xs font-bold uppercase">Temps Réel</span>
                     </div>
-                    <div class="space-y-4">
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-indigo-500">3</div>
-                        <h4 class="text-xl font-bold text-white uppercase">Win</h4>
-                        <p class="text-sm text-slate-400 leading-relaxed">Récupérez votre item ou votre dépôt.</p>
+                </div>
+                <div class="glass p-10 rounded-[3rem] hover-card">
+                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Opérateurs</p>
+                    <h3 class="text-5xl font-black text-white tracking-tighter italic">1 402</h3>
+                    <div class="mt-4 flex items-center gap-2 text-slate-600">
+                        <i class="fa-solid fa-users"></i>
+                        <span class="text-xs font-bold uppercase">Actifs</span>
                     </div>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                <div class="space-y-8">
-                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Dernières ventes</h2>
-                    <div id="activity-feed" class="space-y-3"></div>
+            <section class="space-y-20">
+                <div class="flex items-end justify-between border-b border-white/5 pb-10">
+                    <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">Protocole d'Enchère</h2>
+                    <p class="text-slate-500 font-bold uppercase text-xs tracking-widest italic">Méthodologie DropBid</p>
                 </div>
-                <div class="space-y-8">
-                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Le plus recherché</h2>
-                    <div id="featured-assets" class="grid grid-cols-1 gap-4"></div>
+                <div class="grid grid-cols-3 gap-16">
+                    <div class="group">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">01</div>
+                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Garantie</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">L'accès au marché live nécessite un dépôt de sécurité. Ce montant prouve votre solvabilité et est restitué à 100% en cas de non-acquisition.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">02</div>
+                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Ascension</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">Contrairement au format classique, le prix grimpe chaque seconde. L'acheteur qui valide le prix en premier remporte l'actif instantanément.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">03</div>
+                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Liquidation</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">Dès la validation, l'actif est transféré dans votre inventaire. Les fonds restants de votre garantie sont débloqués immédiatement.</p>
+                    </div>
                 </div>
             </section>
+
+            <section class="grid grid-cols-12 gap-16">
+                <div class="col-span-7 space-y-10">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Flux des Ventes</h2>
+                        <button onclick="window.location.href='sections/live.html'" class="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-white transition-all italic">Ouvrir le Marché →</button>
+                    </div>
+                    <div id="activity-feed" class="space-y-4">
+                        </div>
+                </div>
+
+                <div class="col-span-5 space-y-10">
+                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Focus Actifs</h2>
+                    <div id="featured-assets" class="space-y-6">
+                        </div>
+                </div>
+            </section>
+
         </div>
 
-        <footer class="p-12 border-t border-white/5 text-center text-slate-600">
-            <p class="text-[10px] font-bold uppercase tracking-[0.5em] italic italic">© 2026 DROPBID NETWORK.</p>
+        <footer class="p-20 border-t border-white/[0.03] flex justify-between items-center text-slate-600">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-infinity text-xs"></i>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] italic">© 2026 DROPBID NETWORK TERMINAL</p>
+            </div>
+            <div class="flex gap-8 text-[10px] font-black uppercase tracking-widest">
+                <a href="#" class="hover:text-white">Sécurité</a>
+                <a href="#" class="hover:text-white">API</a>
+                <a href="#" class="hover:text-white">Support</a>
+            </div>
         </footer>
     </main>
 
     <script>
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('open');
-        }
-
+        // --- FLUX DE VENTES EN DIRECT ---
         const activityContainer = document.getElementById('activity-feed');
         function addTrade(name, price) {
             const entry = document.createElement('div');
-            entry.className = "glass p-4 rounded-2xl flex items-center justify-between border-l-2 border-emerald-500";
+            entry.className = "glass p-6 rounded-[2rem] flex items-center justify-between border-l-4 border-emerald-500 hover:bg-white/[0.04] transition-all";
             entry.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[10px] text-emerald-500 font-bold uppercase">WIN</div>
+                <div class="flex items-center gap-6">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-xs text-emerald-500 font-black uppercase">TRADE</div>
                     <div>
-                        <p class="text-[11px] font-bold text-white uppercase">${name}</p>
-                        <p class="text-[9px] text-slate-500 uppercase">${price}€</p>
+                        <p class="text-sm font-black text-white uppercase tracking-tight">${name}</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase italic mt-1">Acquisition à ${price}€</p>
                     </div>
                 </div>
-                <button onclick="window.location.href='sections/live.html'" class="w-8 h-8 glass rounded-full flex items-center justify-center text-xs text-indigo-400"><i class="fa-solid fa-eye"></i></button>
+                <button onclick="window.location.href='sections/live.html'" class="px-6 py-3 glass rounded-xl text-[10px] font-black text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all uppercase">Inspecter</button>
             `;
+            
             activityContainer.prepend(entry);
-            if (activityContainer.children.length > 5) activityContainer.lastElementChild.remove();
+            if (activityContainer.children.length > 5) {
+                activityContainer.lastElementChild.remove();
+            }
         }
 
         setInterval(() => {
-            const items = ["Rolex", "Bitcoin", "Or 24k", "Diamant"];
-            addTrade(items[Math.floor(Math.random() * items.length)], (Math.random() * 5000).toFixed(2));
-        }, 3000);
+            const items = ["Rolex GMT Master", "Bitcoin Core", "Ethereum Node", "Or Pur 24k", "Diamant Brut"];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            const randomPrice = (Math.random() * 10000).toFixed(2);
+            addTrade(randomItem, randomPrice);
+        }, 4000);
 
+        // --- ASSETS VEDETTES ---
         const products = [
-            { name: "Rolex Daytona", buyers: 1240, img: "fa-gem", color: "text-indigo-500" },
-            { name: "Lot 10 ETH", buyers: 2150, img: "fa-coins", color: "text-blue-500" }
+            { name: "Rolex Daytona 2024", buyers: 1240, img_icon: "fa-gem", color: "text-indigo-500" },
+            { name: "Lot 10 ETH Portfolio", buyers: 2150, img_icon: "fa-coins", color: "text-blue-500" },
+            { name: "Tesla Model S (Token)", buyers: 742, img_icon: "fa-car", color: "text-red-500" }
         ];
 
         function renderFeatured() {
-            document.getElementById('featured-assets').innerHTML = products.map(p => `
-                <div class="glass p-6 rounded-3xl flex items-center justify-between group">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl ${p.color}"><i class="fa-solid ${p.img}"></i></div>
-                        <div><h5 class="text-white font-black uppercase italic">${p.name}</h5><p class="text-[10px] text-slate-500 font-bold uppercase">${p.buyers} VUES</p></div>
+            const container = document.getElementById('featured-assets');
+            container.innerHTML = products.map(p => `
+                <div class="glass p-8 rounded-[2.5rem] flex items-center justify-between hover:border-white/20 transition-all group cursor-pointer">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-3xl ${p.color}">
+                            <i class="fa-solid ${p.img_icon}"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-black text-white uppercase italic tracking-tight">${p.name}</h5>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mt-1 italic">
+                                <span class="text-indigo-500 font-black">${p.buyers}</span> observateurs actifs
+                            </p>
+                        </div>
                     </div>
-                    <button onclick="window.location.href='sections/live.html'" class="bg-indigo-600 text-white text-[10px] font-black px-6 py-3 rounded-xl uppercase tracking-widest">Rejoindre</button>
+                    <i class="fa-solid fa-chevron-right text-slate-700 group-hover:text-white transition-colors"></i>
                 </div>
             `).join('');
         }
+
         renderFeatured();
+        addTrade("Rolex Submariner", "14 200.00");
     </script>
 </body>
 </html>
