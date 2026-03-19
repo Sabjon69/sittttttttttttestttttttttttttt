@@ -113,7 +113,20 @@
                     <span id="btn-text">Initialiser Liaison</span>
                 </button>
 
-                <div class="text-center mt-6">
+                <div class="flex flex-col items-center gap-4 py-2">
+                    <div class="w-full flex items-center gap-4">
+                        <div class="h-px flex-1 bg-white/5"></div>
+                        <span class="text-[8px] text-slate-700 font-black uppercase tracking-[0.3em]">Pas de compte ?</span>
+                        <div class="h-px flex-1 bg-white/5"></div>
+                    </div>
+                    
+                    <button onclick="window.location.href='register.html'" class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:text-white transition-all group flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus group-hover:scale-110 transition-transform"></i> 
+                        Ouvrir un accès <span class="text-indigo-600 italic">Blockchain</span>
+                    </button>
+                </div>
+
+                <div class="text-center mt-2">
                     <a href="../index.html" class="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-indigo-400 transition-colors">
                         <i class="fa-solid fa-arrow-left-long mr-2"></i> Retour au Terminal
                     </a>
@@ -154,7 +167,6 @@
             btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-3"></i> Synchronisation...';
 
             setTimeout(() => {
-                // ICI TU METS TA LOGIQUE :
                 // Pour l'exemple, si l'email contient "admin", ça passe.
                 if (email.includes("admin") && password.length >= 4) {
                     btnText.innerHTML = '<i class="fa-solid fa-check mr-3"></i> LIAISON ÉTABLIE';
@@ -162,10 +174,9 @@
                     btn.classList.add('text-white');
                     
                     setTimeout(() => {
-                        window.location.href = "../index.html"; // Redirection si ça marche
+                        window.location.href = "../index.html"; 
                     }, 1000);
                 } else {
-                    // SI CA MARCHE PAS : Message d'erreur pro
                     showError();
                     btn.disabled = false;
                     btn.style.opacity = "1";
@@ -181,7 +192,6 @@
             errorBox.classList.remove('hidden');
             card.classList.add('shake');
             
-            // Son d'erreur système (optionnel)
             const nav = window.navigator;
             if (nav.vibrate) nav.vibrate(200);
         }
