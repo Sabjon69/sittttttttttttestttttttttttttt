@@ -16,6 +16,7 @@
             background-color: #020202; 
             color: #e2e8f0; 
             margin: 0;
+            overflow-x: hidden;
         }
 
         .bg-grid {
@@ -33,7 +34,7 @@
 
         /* --- NAVIGATION RESPONSIVE --- */
         #sidebar {
-            width: 320px;
+            width: 280px;
             height: 100vh;
             background: #050505;
             border-right: 1px solid rgba(255, 255, 255, 0.03);
@@ -45,14 +46,19 @@
         }
 
         .main-container {
-            margin-left: 320px;
+            margin-left: 280px;
             min-height: 100vh;
             transition: margin-left 0.3s;
         }
 
+        @media (min-width: 1024px) {
+            #sidebar { width: 320px; transform: translateX(0) !important; }
+            .main-container { margin-left: 320px; }
+        }
+
         @media (max-width: 1023px) {
-            #sidebar { transform: translateX(-100%); width: 280px; }
-            #sidebar.open { transform: translateX(0); }
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); shadow: 20px 0 50px rgba(0,0,0,0.9); }
             .main-container { margin-left: 0; width: 100%; }
         }
 
@@ -76,7 +82,6 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* --- MODAL AUTH --- */
         .auth-overlay {
             position: fixed;
             inset: 0;
@@ -95,12 +100,12 @@
     <div class="bg-grid"></div>
 
     <div id="auth-modal" class="auth-overlay">
-        <div class="glass p-8 md:p-12 rounded-[3rem] max-w-md text-center border-t-4 border-indigo-500 w-full">
+        <div class="glass p-8 md:p-12 rounded-[2.5rem] md:rounded-[3rem] max-w-md text-center border-t-4 border-indigo-500 w-full">
             <i class="fa-solid fa-lock text-5xl text-indigo-500 mb-6"></i>
             <h3 class="text-2xl font-black text-white uppercase italic mb-4 tracking-tighter">Accès Restreint</h3>
             <p class="text-slate-400 text-sm mb-10 font-medium leading-relaxed">Vous pouvez consulter le flux en temps réel, mais l'interaction avec la blockchain nécessite une liaison active.</p>
             <div class="space-y-4">
-                <button onclick="window.location.href='sections/login.html'" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 hover:text-white transition-all">S'identifier</button>
+                <button onclick="window.location.href='login.html'" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 hover:text-white transition-all">S'identifier</button>
                 <button onclick="document.getElementById('auth-modal').style.display='none'" class="w-full bg-white/5 text-slate-500 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:text-white transition-all">Continuer en lecture seule</button>
             </div>
         </div>
@@ -113,142 +118,145 @@
             </div>
             <span class="font-black uppercase tracking-tighter text-white">Drop<span class="text-indigo-500">Bid</span></span>
         </div>
-        <button onclick="toggleMenu()" class="text-white text-2xl p-2">
+        <button onclick="toggleMenu()" class="text-white text-2xl p-2 h-10 w-10 flex items-center justify-center">
             <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
         </button>
     </header>
 
     <aside id="sidebar">
-        <div class="p-10 border-b border-white/[0.03]">
-            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.3)]">
-                    <i class="fa-solid fa-infinity text-white text-2xl"></i>
+        <div class="p-8 lg:p-10 border-b border-white/[0.03] flex items-center justify-between">
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='../index.html'">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-infinity text-white text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
-                    <p class="text-[10px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-2 italic">Quantum v2.0</p>
+                    <h1 class="text-xl lg:text-2xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
+                    <p class="text-[9px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-1 italic">Quantum v2.0</p>
                 </div>
             </div>
+            <button onclick="toggleMenu()" class="lg:hidden text-slate-500">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
         </div>
         
-        <div class="p-8 border-b border-white/[0.03] space-y-4">
-            <button onclick="window.location.href='sections/register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg">
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] space-y-3">
+            <button onclick="window.location.href='register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg">
                 <i class="fa-solid fa-user-plus"></i> Créer un Accès
             </button>
-            <button onclick="window.location.href='sections/login.html'" class="w-full bg-white/5 border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+            <button onclick="window.location.href='login.html'" class="w-full bg-white/5 border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
                 <i class="fa-solid fa-fingerprint"></i> S'identifier
             </button>
         </div>
 
-        <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto no-scrollbar">
-            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-6 mb-6">Menu Terminal</p>
-            <button class="nav-item nav-active w-full flex items-center gap-5 p-5 rounded-2xl text-slate-400">
-                <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm">Tableau de Bord</span>
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto no-scrollbar">
+            <p class="text-[8px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-4">Menu Terminal</p>
+            <button onclick="window.location.href='../index.html'" class="nav-item w-full flex items-center gap-4 p-4 rounded-xl text-slate-500">
+                <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm">Tableau de Bord</span>
             </button>
-            <button onclick="window.location.href='sections/live.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-chart-line text-xl"></i> <span class="font-bold text-sm">Marché Live</span>
+            <button onclick="window.location.href='live.html'" class="nav-item nav-active w-full flex items-center gap-4 p-4 rounded-xl text-slate-500">
+                <i class="fa-solid fa-chart-line text-lg"></i> <span class="font-bold text-sm">Marché Live</span>
             </button>
-            <button onclick="checkAuthAction()" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-tag text-xl"></i> <span class="font-bold text-sm">Déposer une offre</span>
+            <button onclick="checkAuthAction()" class="nav-item w-full flex items-center gap-4 p-4 rounded-xl text-slate-500">
+                <i class="fa-solid fa-tag text-lg"></i> <span class="font-bold text-sm">Déposer une offre</span>
             </button>
-            <button onclick="checkAuthAction()" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-box-open text-xl"></i> <span class="font-bold text-sm">Mon Inventaire</span>
+            <button onclick="window.location.href='inventory.html'" class="nav-item w-full flex items-center gap-4 p-4 rounded-xl text-slate-500">
+                <i class="fa-solid fa-box-open text-lg"></i> <span class="font-bold text-sm">Mon Inventaire</span>
             </button>
-            <div class="h-px bg-white/[0.03] my-8 mx-6"></div>
-            <button onclick="window.location.href='sections/guide.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-circle-info text-xl"></i> <span class="font-bold text-sm">Aide & Guide</span>
+            <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+            <button onclick="window.location.href='guide.html'" class="nav-item w-full flex items-center gap-4 p-4 rounded-xl text-slate-500">
+                <i class="fa-solid fa-circle-info text-lg"></i> <span class="font-bold text-sm">Aide & Guide</span>
             </button>
         </nav>
 
-        <div class="p-8 bg-black/40 border-t border-white/[0.03]">
-            <div class="flex items-center gap-4">
-                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
+        <div class="p-6 bg-black/40 border-t border-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
             </div>
         </div>
     </aside>
 
     <main class="main-container">
-        <header class="p-8 md:p-20 space-y-6">
+        <header class="p-6 md:p-12 lg:p-20 space-y-4 md:space-y-6">
             <div class="flex items-center gap-3">
-                <span class="w-3 h-3 rounded-full bg-red-500 dot-live"></span>
-                <span class="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">Network Live Status</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 dot-live"></span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Network Live Status</span>
             </div>
-            <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] italic uppercase">
+            <h1 class="text-4xl md:text-6xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] italic uppercase">
                 Gagnez sur <br><span class="text-indigo-600 underline decoration-white/5 not-italic">chaque seconde.</span>
             </h1>
-            <p class="text-slate-500 max-w-2xl text-base md:text-lg font-medium leading-relaxed">
+            <p class="text-slate-500 max-w-2xl text-sm md:text-base lg:text-lg font-medium leading-relaxed">
                 Terminal de trading haute fréquence pour actifs rares. Le prix grimpe en temps réel, la réactivité est votre seule arme.
             </p>
         </header>
 
-        <div class="px-8 md:px-20 pb-32 space-y-24 md:space-y-32">
+        <div class="px-6 md:px-12 lg:px-20 pb-20 space-y-16 md:space-y-32">
             
-            <section class="glass p-10 md:p-20 rounded-[3rem] border-t-4 border-indigo-500 text-center shadow-2xl">
-                <div class="mb-8"><i class="fa-solid fa-lock text-5xl text-indigo-500 animate-pulse"></i></div>
+            <section class="glass p-8 md:p-16 lg:p-20 rounded-[2.5rem] md:rounded-[3rem] border-t-4 border-indigo-500 text-center shadow-2xl">
+                <div class="mb-6"><i class="fa-solid fa-lock text-4xl md:text-5xl text-indigo-500 animate-pulse"></i></div>
                 <h3 class="text-2xl md:text-3xl font-black text-white uppercase italic mb-4 tracking-tighter">Accès Restreint</h3>
-                <p class="text-slate-400 text-sm mb-10 font-medium max-w-sm mx-auto">Vous pouvez consulter le flux en temps réel, mais l'interaction nécessite une liaison active.</p>
+                <p class="text-slate-400 text-sm mb-8 font-medium max-w-sm mx-auto">Vous pouvez consulter le flux en temps réel, mais l'interaction nécessite une liaison active.</p>
                 <div class="flex flex-col md:flex-row gap-4 justify-center">
-                    <button onclick="checkAuthAction()" class="bg-white text-black px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Démarrer l'Audit</button>
-                    <button onclick="document.getElementById('auth-modal').style.display='none'" class="bg-white/5 text-slate-500 px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest border border-white/5">Lecture seule</button>
+                    <button onclick="checkAuthAction()" class="bg-white text-black px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 hover:text-white transition-all">Démarrer l'Audit</button>
+                    <button onclick="document.getElementById('auth-modal').style.display='none'" class="bg-white/5 text-slate-500 px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest border border-white/5 hover:text-white transition-all">Lecture seule</button>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-10 rounded-[3rem] border-l-4 border-indigo-600">
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Volume Global</p>
-                    <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter italic text-nowrap">1 240 101 €</h3>
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <div class="glass p-8 rounded-[2rem] border-l-4 border-indigo-600">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Volume Global</p>
+                    <h3 class="text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter italic">1 240 101 €</h3>
                 </div>
-                <div class="glass p-10 rounded-[3rem]">
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Vitesse Incrément</p>
-                    <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter italic">+0.85 €/s</h3>
+                <div class="glass p-8 rounded-[2rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Vitesse Incrément</p>
+                    <h3 class="text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter italic text-emerald-500">+0.85 €/s</h3>
                 </div>
-                <div class="glass p-10 rounded-[3rem]">
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Opérateurs</p>
-                    <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter italic">1 402</h3>
-                </div>
-            </section>
-
-            <section class="space-y-16">
-                <div class="flex items-end justify-between border-b border-white/5 pb-10">
-                    <h2 class="text-3xl md:text-4xl font-black text-white uppercase italic tracking-tighter">Protocole d'Enchère</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-                    <div class="group">
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">01</div>
-                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Garantie</h4>
-                        <p class="text-slate-500 leading-relaxed font-medium">L'accès au marché live nécessite un dépôt de sécurité.</p>
-                    </div>
-                    <div class="group">
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">02</div>
-                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Ascension</h4>
-                        <p class="text-slate-500 leading-relaxed font-medium">Le prix grimpe chaque seconde.</p>
-                    </div>
-                    <div class="group">
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-2xl font-black text-indigo-500 mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all">03</div>
-                        <h4 class="text-2xl font-black text-white uppercase mb-4 tracking-tight">Liquidation</h4>
-                        <p class="text-slate-500 leading-relaxed font-medium">L'actif est transféré immédiatement.</p>
-                    </div>
+                <div class="glass p-8 rounded-[2rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Opérateurs</p>
+                    <h3 class="text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter italic">1 402</h3>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 lg:grid-cols-12 gap-16">
-                <div class="lg:col-span-7 space-y-10">
-                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Flux des Ventes</h2>
+            <section class="space-y-12">
+                <div class="flex items-end justify-between border-b border-white/5 pb-6">
+                    <h2 class="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter">Protocole d'Enchère</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+                    <div class="group">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-600/10 flex items-center justify-center text-xl font-black text-indigo-500 mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">01</div>
+                        <h4 class="text-xl font-black text-white uppercase mb-3 tracking-tight">Garantie</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">L'accès au marché live nécessite un dépôt de sécurité blockchain.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-600/10 flex items-center justify-center text-xl font-black text-indigo-500 mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">02</div>
+                        <h4 class="text-xl font-black text-white uppercase mb-3 tracking-tight">Ascension</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">Le prix grimpe chaque seconde via algorithme Quantum.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-600/10 flex items-center justify-center text-xl font-black text-indigo-500 mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">03</div>
+                        <h4 class="text-xl font-black text-white uppercase mb-3 tracking-tight">Liquidation</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">L'actif est transféré immédiatement après validation.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16">
+                <div class="lg:col-span-7 space-y-8">
+                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Flux des Ventes</h2>
                     <div id="activity-feed" class="space-y-4"></div>
                 </div>
-                <div class="lg:col-span-5 space-y-10">
-                    <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Focus Actifs</h2>
-                    <div id="featured-assets" class="space-y-6"></div>
+                <div class="lg:col-span-5 space-y-8">
+                    <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter">Focus Actifs</h2>
+                    <div id="featured-assets" class="space-y-4"></div>
                 </div>
             </section>
         </div>
 
         <footer class="p-10 md:p-20 border-t border-white/[0.03] flex flex-col md:flex-row justify-between items-center gap-6 text-slate-600 text-center">
-            <p class="text-[10px] font-black uppercase tracking-[0.4em] italic">© 2026 DROPBID NETWORK TERMINAL</p>
-            <div class="flex gap-8">
-                <i class="fa-brands fa-ethereum hover:text-white transition-colors"></i>
-                <i class="fa-brands fa-bitcoin hover:text-white transition-colors"></i>
+            <p class="text-[9px] font-black uppercase tracking-[0.4em] italic">© 2026 DROPBID NETWORK TERMINAL</p>
+            <div class="flex gap-8 text-xl">
+                <i class="fa-brands fa-ethereum hover:text-white transition-colors cursor-pointer"></i>
+                <i class="fa-brands fa-bitcoin hover:text-white transition-colors cursor-pointer"></i>
             </div>
         </footer>
     </main>
@@ -258,8 +266,11 @@
             const sidebar = document.getElementById('sidebar');
             const icon = document.getElementById('menu-icon');
             sidebar.classList.toggle('open');
-            icon.classList.toggle('fa-bars-staggered');
-            icon.classList.toggle('fa-xmark');
+            if(sidebar.classList.contains('open')) {
+                icon.classList.replace('fa-bars-staggered', 'fa-xmark');
+            } else {
+                icon.classList.replace('fa-xmark', 'fa-bars-staggered');
+            }
         }
 
         function checkAuthAction() {
@@ -270,17 +281,19 @@
         function addTrade(name, price) {
             if(!activityContainer) return;
             const entry = document.createElement('div');
-            entry.className = "glass p-6 rounded-[2rem] flex items-center justify-between border-l-4 border-emerald-500 hover:bg-white/[0.04] transition-all cursor-pointer";
+            entry.className = "glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-between border-l-4 border-emerald-500 hover:bg-white/[0.04] transition-all cursor-pointer group";
             entry.onclick = checkAuthAction; 
             entry.innerHTML = `
-                <div class="flex items-center gap-4 md:gap-6">
-                    <div class="hidden md:flex w-12 h-12 rounded-xl bg-emerald-500/10 items-center justify-center text-xs text-emerald-500 font-black uppercase">TRADE</div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex w-10 h-10 rounded-xl bg-emerald-500/10 items-center justify-center text-[10px] text-emerald-500 font-black">LIVE</div>
                     <div>
-                        <p class="text-sm font-black text-white uppercase tracking-tight">${name}</p>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase italic mt-1">${price}€</p>
+                        <p class="text-sm font-black text-white uppercase tracking-tight group-hover:text-emerald-400 transition-colors">${name}</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">${price}€</p>
                     </div>
                 </div>
-                <div class="text-right"><p class="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Complété</p></div>
+                <div class="text-right">
+                    <p class="text-[9px] text-emerald-500 font-black uppercase tracking-widest">Complété</p>
+                </div>
             `;
             activityContainer.prepend(entry);
         }
@@ -295,17 +308,17 @@
             const container = document.getElementById('featured-assets');
             if(!container) return;
             container.innerHTML = products.map(p => `
-                <div onclick="checkAuthAction()" class="glass p-6 md:p-8 rounded-[2.5rem] flex items-center justify-between group cursor-pointer">
-                    <div class="flex items-center gap-6">
-                        <div class="w-12 h-12 md:w-16 md:h-16 bg-white/5 rounded-2xl flex items-center justify-center text-2xl md:text-3xl ${p.color}">
+                <div onclick="checkAuthAction()" class="glass p-5 md:p-6 rounded-[2rem] flex items-center justify-between group cursor-pointer border border-white/5 hover:border-indigo-500/30 transition-all">
+                    <div class="flex items-center gap-4 md:gap-6">
+                        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-xl ${p.color}">
                             <i class="fa-solid ${p.img_icon}"></i>
                         </div>
                         <div>
-                            <h5 class="text-base md:text-lg font-black text-white uppercase italic">${p.name}</h5>
-                            <p class="text-[9px] text-slate-500 font-black uppercase mt-1">${p.buyers} Enchérisseurs</p>
+                            <h5 class="text-sm md:text-base font-black text-white uppercase italic">${p.name}</h5>
+                            <p class="text-[9px] text-slate-500 font-black uppercase mt-1">${p.buyers} Opérateurs</p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-slate-800 group-hover:text-indigo-500 transition-colors"></i>
+                    <i class="fa-solid fa-chevron-right text-slate-800 group-hover:text-indigo-500 transition-transform group-hover:translate-x-1"></i>
                 </div>
             `).join('');
         }
