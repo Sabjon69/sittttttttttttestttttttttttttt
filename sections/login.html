@@ -2,15 +2,30 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropBid | Liaison Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Animation de scanline pour l'effet Cyber */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #010409;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Effet de scanline Quantum */
         .scanline {
             width: 100%;
             height: 2px;
             z-index: 5;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(99, 102, 241, 0.2);
             position: absolute;
             animation: scanline 6s linear infinite;
         }
@@ -18,57 +33,158 @@
             0% { top: 0; }
             100% { top: 100%; }
         }
+
+        .glass-panel {
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Animation d'erreur */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        input {
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        input:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
     </style>
 </head>
-<body class="bg-transparent">
-    <div class="animate-view-enter max-w-md mx-auto mt-20 px-4">
+<body class="p-4">
+
+    <div class="w-full max-w-md">
         
-        <div class="relative glass-panel p-10 rounded-[2.5rem] border border-white/10 bg-[#010409]/95 backdrop-blur-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        <div id="error-box" class="hidden mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/50 flex items-center gap-4 animate-fadeIn">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl"></i>
+            <div>
+                <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Échec de Synchronisation</p>
+                <p class="text-xs text-red-200/70 font-medium">Email ou mot de passe invalide. Accès refusé.</p>
+            </div>
+        </div>
+
+        <div id="login-card" class="relative glass-panel p-8 md:p-12 rounded-[2.5rem] overflow-hidden shadow-2xl">
             
             <div class="scanline"></div>
-            <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-[100px] animate-pulse"></div>
-
+            
             <div class="text-center mb-10 relative z-10">
-                <div class="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/20 shadow-[0_0_30px_rgba(79,70,229,0.2)]">
+                <div class="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/20 shadow-[0_0_40px_rgba(79,70,229,0.15)]">
                     <i class="fa-solid fa-fingerprint text-4xl text-indigo-500"></i>
                 </div>
-                <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Identification</h2>
-                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-2 text-center">Système Quantum v2.0</p>
+                <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Liaison <span class="text-indigo-500">Réseau</span></h2>
+                <p class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em] mt-3">Auth Protocol v8.4.2</p>
             </div>
 
             <div class="space-y-6 relative z-10">
+                
                 <div class="group">
-                    <div class="flex justify-between mb-2 px-2">
-                        <label class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Identifiant Réseau</label>
-                        <span class="text-[8px] text-indigo-500/50 font-mono uppercase">Signal Ready</span>
-                    </div>
-                    
+                    <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2">Identifiant Email</label>
                     <div class="relative">
-                        <i class="fa-solid fa-terminal absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors"></i>
-                        
-                        <input type="text" id="FINAL-LOGIN-INPUT" 
-                            class="w-full bg-black/60 border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono text-sm placeholder:text-slate-800" 
-                            placeholder="root@operator"
-                            autocomplete="off"
-                            onkeypress="if(event.key === 'Enter') executeLogin()">
+                        <i class="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors"></i>
+                        <input type="email" id="email" 
+                            class="w-full py-5 pl-14 pr-6 rounded-2xl text-white font-medium text-sm placeholder:text-slate-800" 
+                            placeholder="votre@email.com" required>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2">Code d'accès</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-shield-halved absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors"></i>
+                        <input type="password" id="password" 
+                            class="w-full py-5 pl-14 pr-6 rounded-2xl text-white font-medium text-sm placeholder:text-slate-800" 
+                            placeholder="••••••••••••" required>
                     </div>
                 </div>
                 
-                <button onclick="executeLogin()" class="group relative w-full overflow-hidden py-5 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-[0.4em] transition-all hover:tracking-[0.5em] active:scale-95 shadow-xl">
-                    <span class="relative z-10">Initialiser la Liaison</span>
+                <button onclick="executeLogin()" id="btn-login" class="group relative w-full h-20 rounded-2xl bg-white text-black font-black uppercase text-xs tracking-[0.5em] transition-all hover:tracking-[0.6em] active:scale-95 shadow-xl flex items-center justify-center">
+                    <span id="btn-text">Initialiser Liaison</span>
                 </button>
 
-                <div class="flex flex-col items-center gap-4 mt-6">
-                    <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                        Encryption AES-256 Active
-                    </p>
+                <div class="text-center mt-6">
+                    <a href="../index.html" class="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-indigo-400 transition-colors">
+                        <i class="fa-solid fa-arrow-left-long mr-2"></i> Retour au Terminal
+                    </a>
                 </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-white/5 flex justify-center">
+                <p class="text-[8px] text-slate-700 uppercase font-black tracking-[0.3em] flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    Quantum Encryption Active
+                </p>
             </div>
         </div>
     </div>
+
+    <script>
+        function executeLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('btn-login');
+            const btnText = document.getElementById('btn-text');
+            const errorBox = document.getElementById('error-box');
+            const card = document.getElementById('login-card');
+
+            // 1. Reset
+            errorBox.classList.add('hidden');
+            card.classList.remove('shake');
+
+            // 2. Vérification rapide
+            if (!email || !password) {
+                showError();
+                return;
+            }
+
+            // 3. Simulation de chargement pro
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+            btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-3"></i> Synchronisation...';
+
+            setTimeout(() => {
+                // ICI TU METS TA LOGIQUE :
+                // Pour l'exemple, si l'email contient "admin", ça passe.
+                if (email.includes("admin") && password.length >= 4) {
+                    btnText.innerHTML = '<i class="fa-solid fa-check mr-3"></i> LIAISON ÉTABLIE';
+                    btn.classList.replace('bg-white', 'bg-emerald-500');
+                    btn.classList.add('text-white');
+                    
+                    setTimeout(() => {
+                        window.location.href = "../index.html"; // Redirection si ça marche
+                    }, 1000);
+                } else {
+                    // SI CA MARCHE PAS : Message d'erreur pro
+                    showError();
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btnText.innerHTML = "Initialiser Liaison";
+                }
+            }, 2000);
+        }
+
+        function showError() {
+            const errorBox = document.getElementById('error-box');
+            const card = document.getElementById('login-card');
+            
+            errorBox.classList.remove('hidden');
+            card.classList.add('shake');
+            
+            // Son d'erreur système (optionnel)
+            const nav = window.navigator;
+            if (nav.vibrate) nav.vibrate(200);
+        }
+    </script>
 </body>
 </html>
-
-
-
