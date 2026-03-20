@@ -105,55 +105,82 @@
         <button onclick="toggleSidebar()" class="text-white text-2xl"><i class="fa-solid fa-bars-staggered"></i></button>
     </header>
 
-    <aside id="sidebar" class="sidebar-fixed">
-        <div class="p-10 border-b border-white/[0.03]">
-            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.3)] group-hover:rotate-12 transition-transform">
-                    <i class="fa-solid fa-infinity text-white text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-black text-white uppercase tracking-tighter leading-none">Drop<span class="text-indigo-500">Bid</span></h1>
-                    <p class="text-[10px] text-slate-500 font-bold tracking-[0.3em] uppercase mt-2 italic">Quantum v2.0</p>
+<aside id="sidebar" class="sidebar-fixed flex flex-col bg-[#050505] border-r border-white/[0.05]">
+    
+    <div class="p-6 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-center lg:justify-start min-h-[120px] lg:min-h-[160px]">
+        <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full pointer-events-none"></div>
+
+        <div class="flex items-center gap-4 lg:gap-6 group cursor-pointer relative z-10" onclick="window.location.href='index.html'">
+            <div class="w-14 h-14 lg:w-20 lg:h-20 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)] group-hover:rotate-3 group-hover:scale-105 transition-all duration-500 overflow-hidden">
+                <img src="../assets/Sans titre (1).png" 
+                     alt="Logo IRYON" 
+                     class="w-full h-full object-contain p-2 transform scale-125 transition-transform duration-700 group-hover:scale-150">
+            </div>
+
+            <div class="hidden lg:block">
+                <h1 class="text-2xl lg:text-3xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">
+                    IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span>
+                </h1>
+                <div class="flex items-center gap-2 mt-3">
+                    <div class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </div>
+                    <p class="text-[9px] text-slate-500 font-black tracking-[0.4em] uppercase italic">Quantum Terminal</p>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="p-4 lg:p-8 border-b border-white/[0.03] space-y-4 flex flex-col items-center">
+        <button onclick="window.location.href='sections/register.html'" class="w-full max-w-[60px] lg:max-w-none bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20">
+            <i class="fa-solid fa-user-plus text-lg lg:text-xs"></i> 
+            <span class="hidden lg:inline tracking-[0.2em]">Créer un Accès</span>
+        </button>
+        <button onclick="window.location.href='sections/login.html'" class="w-full max-w-[60px] lg:max-w-none bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-black uppercase flex items-center justify-center gap-3">
+            <i class="fa-solid fa-fingerprint text-lg lg:text-xs"></i> 
+            <span class="hidden lg:inline tracking-[0.2em]">S'identifier</span>
+        </button>
+    </div>
+
+    <nav class="flex-1 px-2 lg:px-4 py-8 space-y-2 overflow-y-auto no-scrollbar flex flex-col items-center lg:items-stretch">
+        <p class="hidden lg:block text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-6 mb-6 text-center lg:text-left">Menu Terminal</p>
         
-        <div class="p-8 border-b border-white/[0.03] space-y-4">
-            <button onclick="window.location.href='sections/register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20">
-                <i class="fa-solid fa-user-plus"></i> Créer un Accès
-            </button>
-            <button onclick="window.location.href='sections/login.html'" class="w-full bg-white/5 border border-white/10 hover:border-indigo-500/50 text-slate-400 hover:text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
-                <i class="fa-solid fa-fingerprint"></i> S'identifier
-            </button>
-        </div>
+        <button class="nav-item nav-active w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-400">
+            <i class="fa-solid fa-house text-xl"></i> 
+            <span class="hidden lg:block font-bold text-sm tracking-wide">Tableau de Bord</span>
+        </button>
 
-        <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto no-scrollbar">
-            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-6 mb-6">Menu Terminal</p>
-            <button class="nav-item nav-active w-full flex items-center gap-5 p-5 rounded-2xl text-slate-400">
-                <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
-            </button>
-            <button onclick="window.location.href='sections/live.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-chart-line text-xl"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
-            </button>
-            <button onclick="checkAuthAction()" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-tag text-xl"></i> <span class="font-bold text-sm tracking-wide">Déposer une offre</span>
-            </button>
-            <button onclick="checkAuthAction()" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-box-open text-xl"></i> <span class="font-bold text-sm tracking-wide">Mon Inventaire</span>
-            </button>
-            <div class="h-px bg-white/[0.03] my-8 mx-6"></div>
-            <button onclick="window.location.href='sections/guide.html'" class="nav-item w-full flex items-center gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-circle-info text-xl"></i> <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
-            </button>
-        </nav>
+        <button onclick="window.location.href='sections/live.html'" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
+            <i class="fa-solid fa-chart-line text-xl"></i> 
+            <span class="hidden lg:block font-bold text-sm tracking-wide">Marché Live</span>
+        </button>
 
-        <div class="p-8 bg-black/40 border-t border-white/[0.03]">
-            <div class="flex items-center gap-4">
-                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
-            </div>
+        <button onclick="checkAuthAction()" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
+            <i class="fa-solid fa-tag text-xl"></i> 
+            <span class="hidden lg:block font-bold text-sm tracking-wide">Déposer une offre</span>
+        </button>
+
+        <button onclick="checkAuthAction()" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
+            <i class="fa-solid fa-box-open text-xl"></i> 
+            <span class="hidden lg:block font-bold text-sm tracking-wide">Mon Inventaire</span>
+        </button>
+
+        <div class="h-px bg-white/[0.03] my-8 mx-6 w-full lg:w-auto"></div>
+
+        <button onclick="window.location.href='sections/guide.html'" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
+            <i class="fa-solid fa-circle-info text-xl"></i> 
+            <span class="hidden lg:block font-bold text-sm tracking-wide">Aide & Guide</span>
+        </button>
+    </nav>
+
+    <div class="p-8 bg-black/40 border-t border-white/[0.03] flex justify-center lg:justify-start">
+        <div class="flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span class="hidden lg:inline text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
         </div>
-    </aside>
+    </div>
+</aside>
 
     <main class="main-container">
         <header class="p-8 md:p-20 space-y-6">
