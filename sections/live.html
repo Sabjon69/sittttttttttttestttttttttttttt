@@ -1,53 +1,65 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IRYON | Marché Live Quantum</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
         
-        body { font-family: 'Inter', sans-serif; background: #050505; color: white; margin: 0; overflow-x: hidden; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #020202; 
+            color: #e2e8f0; 
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
         /* --- SYSTÈME DE SIDEBAR & RESPONSIVITÉ --- */
-        #sidebar {
+        .sidebar-fixed {
+            width: 320px;
+            height: 100vh;
+            background: #050505;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
             position: fixed;
             left: 0;
             top: 0;
-            bottom: 0;
-            width: 80px; /* Taille icônes par défaut */
+            display: flex;
+            flex-direction: column;
             z-index: 1000;
-            background: #050505;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
-        }
-        
-        @media (min-width: 1024px) {
-            #sidebar { width: 320px; }
-            .main-content { margin-left: 320px; }
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @media (max-width: 1023px) {
-            #sidebar { transform: translateX(-100%); width: 280px; }
-            #sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding-top: 80px; }
-            /* On force l'affichage du texte quand le menu mobile est ouvert */
-            #sidebar.open .hidden.lg\:block { display: block !important; }
-            #sidebar.open .hidden.lg\:inline { display: inline !important; }
-            #sidebar.open .lg\:max-w-none { max-width: none !important; }
-            #sidebar.open .lg\:justify-start { justify-content: flex-start !important; }
-            #sidebar.open .lg\:px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+        .main-container {
+            margin-left: 320px;
+            width: auto;
+            min-height: 100vh;
+            transition: all 0.4s;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-fixed { transform: translateX(-100%); }
+            .sidebar-fixed.open { transform: translateX(0); width: 280px; }
+            .main-container { margin-left: 0; width: 100%; }
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* --- ANIMATIONS --- */
-        .nav-item { transition: all 0.3s ease; border: 1px solid transparent; }
-        .nav-active { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+        /* --- ANIMATIONS & STYLE --- */
+        .nav-active { background: rgba(99, 102, 241, 0.08); border-left: 4px solid #6366f1; color: white !important; }
         
         @keyframes modalSlideUp {
             from { opacity: 0; transform: translateY(30px) scale(0.95); }
@@ -56,18 +68,25 @@
         .animate-modal { animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         .live-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.4s ease;
         }
         .live-card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.4);
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            background: rgba(99, 102, 241, 0.05);
         }
+
+        .dot-live { width: 8px; height: 8px; background: #6366f1; border-radius: 50%; box-shadow: 0 0 10px #6366f1; animation: pulse-indigo 2s infinite; }
+        @keyframes pulse-indigo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="antialiased">
+
+    <div class="bg-grid"></div>
 
     <div id="auth-modal" class="hidden fixed inset-0 z-[5000] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
         <div class="animate-modal w-full max-w-[420px] bg-[#050505] border border-white/10 rounded-[3rem] p-10 text-center relative shadow-[0_0_100px_rgba(0,0,0,1)]">
@@ -96,91 +115,72 @@
         </div>
     </div>
 
-    <header class="lg:hidden flex items-center justify-between p-5 bg-[#050505] border-b border-white/5 sticky top-0 z-[500]">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-infinity text-white text-sm"></i></div>
-            <span class="font-black uppercase tracking-tighter text-white">Drop<span class="text-indigo-500">Bid</span></span>
+    <header class="lg:hidden flex items-center justify-between p-6 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[1100] min-h-[140px]">
+        <div class="flex items-center gap-6" onclick="window.location.href='../index.html'">
+            <div class="w-[100px] h-[100px] bg-indigo-500/5 border border-indigo-500/20 rounded-[2rem] flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(79,70,229,0.2)]">
+                <img src="assets/logo.png" alt="Logo IRYON" class="w-full h-full object-contain p-1 transform scale-150">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="font-[1000] uppercase tracking-tighter text-white italic text-4xl leading-[0.8] mb-2">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                <div class="flex items-center gap-2">
+                    <div class="dot-live"></div>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] italic">Quantum Live</span>
+                </div>
+            </div>
         </div>
-        <button onclick="toggleSidebar()" class="text-white text-2xl px-2"><i class="fa-solid fa-bars-staggered"></i></button>
+        <button onclick="toggleSidebar()" class="w-16 h-16 flex items-center justify-center rounded-[1.5rem] bg-white/5 border border-white/10 text-white text-3xl">
+            <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
+        </button>
     </header>
 
-    <aside id="sidebar" class="no-scrollbar flex flex-col">
-        
-        <div class="p-6 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-center lg:justify-start min-h-[120px] lg:min-h-[160px]">
+    <aside id="sidebar" class="sidebar-fixed flex flex-col bg-[#050505] border-r border-white/[0.05]">
+        <div class="p-8 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-start min-h-[160px]">
             <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full pointer-events-none"></div>
-
-            <div class="flex items-center gap-4 lg:gap-6 group cursor-pointer relative z-10" onclick="window.location.href='index.html'">
-                <div class="w-14 h-14 lg:w-20 lg:h-20 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)] group-hover:rotate-3 group-hover:scale-105 transition-all duration-500 overflow-hidden">
-                    <img src="../assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-125 lg:scale-150 transition-transform duration-700">
+            <div class="flex items-center gap-6 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
+                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-150 transition-transform duration-700 group-hover:scale-[1.7]">
                 </div>
-
-                <div class="hidden lg:block">
-                    <h1 class="text-2xl lg:text-3xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">
-                        IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span>
-                    </h1>
-                    <div class="flex items-center gap-2 mt-3">
-                        <div class="flex h-2 w-2 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                        </div>
-                        <p class="text-[9px] text-slate-500 font-black tracking-[0.4em] uppercase italic">Quantum Terminal</p>
-                    </div>
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                    <p class="text-[9px] text-slate-500 font-black tracking-[0.4em] uppercase italic mt-3">Quantum Terminal</p>
                 </div>
             </div>
         </div>
         
-        <div class="p-4 lg:p-8 border-b border-white/[0.03] space-y-4 flex flex-col items-center">
-            <button onclick="window.location.href='register.html'" class="w-full max-w-[60px] lg:max-w-none bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase flex items-center justify-center gap-3 transition-all">
-                <i class="fa-solid fa-user-plus text-lg lg:text-xs"></i> 
-                <span class="hidden lg:inline tracking-[0.2em]">Créer un Accès</span>
-            </button>
-            <button onclick="window.location.href='login.html'" class="w-full max-w-[60px] lg:max-w-none bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-black uppercase flex items-center justify-center gap-3 transition-all">
-                <i class="fa-solid fa-fingerprint text-lg lg:text-xs"></i> 
-                <span class="hidden lg:inline tracking-[0.2em]">S'identifier</span>
-            </button>
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] space-y-4">
+            <button onclick="window.location.href='register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">Créer Accès</button>
+            <button onclick="window.location.href='login.html'" class="w-full bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">S'identifier</button>
         </div>
 
-        <nav class="flex-1 px-2 lg:px-4 py-8 space-y-2 overflow-y-auto no-scrollbar flex flex-col items-center lg:items-stretch">
-            <p class="hidden lg:block text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-6 mb-6">Menu Terminal</p>
+        <nav class="flex-1 px-4 lg:px-6 py-8 space-y-2 overflow-y-auto no-scrollbar">
+            <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
+            </button>
+            <button class="w-full flex items-center gap-5 p-4 rounded-2xl nav-active text-white">
+                <i class="fa-solid fa-chart-line text-xl text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
+            </button>
+            <button onclick="openModal()" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-tag text-xl"></i> <span class="font-bold text-sm tracking-wide">Déposer une offre</span>
+            </button>
+            <button onclick="openModal()" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-box-open text-xl"></i> <span class="font-bold text-sm tracking-wide">Mon Inventaire</span>
+            </button>
             
-            <button onclick="window.location.href='../index.html'" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-400">
-                <i class="fa-solid fa-house text-xl"></i> 
-                <span class="hidden lg:block font-bold text-sm tracking-wide">Tableau de Bord</span>
-            </button>
-
-            <button class="nav-item nav-active w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-white">
-                <i class="fa-solid fa-chart-line text-xl text-indigo-400"></i> 
-                <span class="hidden lg:block font-bold text-sm tracking-wide">Marché Live</span>
-            </button>
-
-            <button onclick="openModal()" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-tag text-xl"></i> 
-                <span class="hidden lg:block font-bold text-sm tracking-wide">Déposer une offre</span>
-            </button>
-
-            <button onclick="openModal()" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-box-open text-xl"></i> 
-                <span class="hidden lg:block font-bold text-sm tracking-wide">Mon Inventaire</span>
-            </button>
-
-            <div class="h-px bg-white/[0.03] my-8 mx-6 w-full lg:w-auto"></div>
-
-            <button onclick="window.location.href='guide.html'" class="nav-item w-full flex items-center justify-center lg:justify-start gap-5 p-5 rounded-2xl text-slate-500">
-                <i class="fa-solid fa-circle-info text-xl"></i> 
-                <span class="hidden lg:block font-bold text-sm tracking-wide">Aide & Guide</span>
+            <div class="h-px bg-white/[0.03] my-8 mx-4"></div>
+            
+            <button onclick="window.location.href='guide.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-circle-info text-xl"></i> <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
             </button>
         </nav>
 
-        <div class="p-8 bg-black/40 border-t border-white/[0.03] flex justify-center lg:justify-start">
-            <div class="flex items-center gap-4">
-                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                <span class="hidden lg:inline text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
-            </div>
+        <div class="p-8 bg-black/40 border-t border-white/[0.03] flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Offline Protocol</span>
         </div>
     </aside>
 
-    <main class="main-content min-h-screen p-6 md:p-12 transition-all">
-        <div class="max-w-7xl mx-auto">
+    <main class="main-container">
+        <div class="max-w-7xl mx-auto p-6 md:p-12">
             
             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-10 mb-16">
                 <div>
@@ -196,7 +196,7 @@
                         <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-slate-600"></i>
                         <input type="text" placeholder="Rechercher un actif..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-8 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-slate-700">
                     </div>
-                    <button class="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                    <button class="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-slate-400 hover:text-white transition-all hover:bg-white/10">
                         <i class="fa-solid fa-sliders text-xl"></i>
                     </button>
                 </div>
@@ -264,7 +264,7 @@
                             <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1 italic">Offre Actuelle</p>
                             <p class="text-3xl font-mono font-black text-white tracking-tighter">450.80€</p>
                         </div>
-                        <div class="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center">
+                        <div class="w-14 h-14 bg-white/10 text-white rounded-full flex items-center justify-center group-hover:bg-emerald-500 transition-all">
                             <i class="fa-solid fa-arrow-right text-xl"></i>
                         </div>
                     </div>
@@ -286,7 +286,7 @@
                             <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1 italic">Offre Actuelle</p>
                             <p class="text-3xl font-mono font-black text-white tracking-tighter">3,100.00€</p>
                         </div>
-                        <div class="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center">
+                        <div class="w-14 h-14 bg-white/10 text-white rounded-full flex items-center justify-center group-hover:bg-amber-500 transition-all">
                             <i class="fa-solid fa-arrow-right text-xl"></i>
                         </div>
                     </div>
@@ -297,19 +297,21 @@
     </main>
 
     <script>
-        // Gestion de la sidebar responsive
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('menu-icon');
             sidebar.classList.toggle('open');
-            // Empêcher le scroll du body quand le menu mobile est ouvert
+            
             if(sidebar.classList.contains('open')) {
+                icon.classList.replace('fa-bars-staggered', 'fa-xmark');
                 document.body.style.overflow = 'hidden';
             } else {
+                icon.classList.replace('fa-xmark', 'fa-bars-staggered');
                 document.body.style.overflow = 'auto';
             }
         }
 
-        // Système de Modal
+        // Système de Modal préservé
         function openModal() {
             document.getElementById('auth-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';

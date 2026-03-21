@@ -1,100 +1,117 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IRYON | Mon Coffre-Fort Quantum</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #050505; 
+            background-color: #020202; 
             color: #e2e8f0; 
-            margin: 0; 
+            margin: 0;
             overflow-x: hidden;
         }
 
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        /* --- SYSTÈME DE SIDEBAR & RESPONSIVITÉ --- */
+        .sidebar-fixed {
+            width: 320px;
+            height: 100vh;
+            background: #050505;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-container {
+            margin-left: 320px;
+            width: auto;
+            min-height: 100vh;
+            transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-fixed { transform: translateX(-100%); }
+            .sidebar-fixed.open { transform: translateX(0); width: 280px; }
+            .main-container { margin-left: 0; width: 100%; }
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* Sidebar Responsive Logic */
-        @media (max-width: 1023px) {
-            #sidebar { transform: translateX(-100%); z-index: 2000; }
-            #sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; padding-top: 80px !important; }
-        }
-
-        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: #050505; }
-
-        .nav-active { 
-            background: rgba(99, 102, 241, 0.08); 
-            border-left: 4px solid #6366f1; 
-            color: white !important; 
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade { animation: fadeIn 0.5s ease-out forwards; }
         
-        .glass { 
-            background: rgba(255, 255, 255, 0.02); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-        }
+        /* --- ANIMATIONS & STYLE --- */
+        .nav-active { background: rgba(99, 102, 241, 0.08); border-left: 4px solid #6366f1; color: white !important; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .dot-live { width: 8px; height: 8px; background: #6366f1; border-radius: 50%; box-shadow: 0 0 10px #6366f1; animation: pulse-indigo 2s infinite; }
+        @keyframes pulse-indigo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } }
     </style>
 </head>
-<body class="min-h-screen flex antialiased">
+<body class="antialiased flex min-h-screen">
 
-    <header class="lg:hidden fixed top-0 left-0 w-full bg-[#050505]/95 backdrop-blur-xl border-b border-white/[0.05] p-4 flex justify-between items-center z-[1100]">
-        <div class="flex items-center gap-4" onclick="window.location.href='../index.html'">
-            <div class="w-32 h-32 flex items-center justify-center">
-                 <img src="../assets/logo.png" alt="Logo IRYON" class="w-full h-full object-contain transform scale-125">
+    <div class="bg-grid"></div>
+
+    <header class="lg:hidden fixed top-0 left-0 w-full flex items-center justify-between p-6 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5 z-[1100] min-h-[140px]">
+        <div class="flex items-center gap-6" onclick="window.location.href='../index.html'">
+            <div class="w-[100px] h-[100px] bg-indigo-500/5 border border-indigo-500/20 rounded-[2rem] flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(79,70,229,0.2)]">
+                <img src="assets/logo.png" alt="Logo IRYON" class="w-full h-full object-contain p-1 transform scale-150">
             </div>
             <div class="flex flex-col">
-                <h1 class="font-[1000] uppercase tracking-tighter text-white italic text-4xl leading-[0.8] mb-2">
-                    IRYON<br>
-                    <span class="text-indigo-500 not-italic">ENCHÈRES</span>
-                </h1>
-                <span class="text-[8px] text-slate-500 font-black uppercase tracking-[0.3em] mt-0.5">Quantum Live</span>
+                <h1 class="font-[1000] uppercase tracking-tighter text-white italic text-4xl leading-[0.8] mb-2">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                <div class="flex items-center gap-2">
+                    <div class="dot-live"></div>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] italic">Quantum Live</span>
+                </div>
             </div>
         </div>
-        <button onclick="toggleMenu()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white text-2xl">
+        <button onclick="toggleSidebar()" class="w-16 h-16 flex items-center justify-center rounded-[1.5rem] bg-white/5 border border-white/10 text-white text-3xl">
             <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
         </button>
     </header>
 
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 lg:w-80 border-r border-white/[0.05] flex flex-col">
-        <div class="p-8 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-start min-h-[140px]">
+    <aside id="sidebar" class="sidebar-fixed bg-[#050505]">
+        <div class="p-8 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-start min-h-[160px]">
             <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full pointer-events-none"></div>
-            <div class="flex items-center gap-5 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
-                <div class="w-16 h-16 bg-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-3 transition-all duration-500">
-                    <img src="../assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1 transform scale-150 transition-transform duration-700 group-hover:scale-[1.8]">
+            <div class="flex items-center gap-6 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
+                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-150 transition-transform duration-700 group-hover:scale-[1.7]">
                 </div>
                 <div>
-                    <h1 class="text-2xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
-                    <div class="flex items-center gap-2 mt-3">
-                        <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_8px_#6366f1]"></span>
-                        <p class="text-[8px] text-slate-500 font-black tracking-[0.3em] uppercase italic leading-none">Terminal v2.0</p>
-                    </div>
+                    <h1 class="text-2xl lg:text-3xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                    <p class="text-[9px] text-slate-500 font-black tracking-[0.4em] uppercase italic mt-3">Quantum Terminal</p>
                 </div>
             </div>
         </div>
         
-        <div class="p-6 lg:p-8 border-b border-white/[0.03] space-y-3">
-            <button onclick="window.location.href='register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20">
-                <i class="fa-solid fa-user-plus"></i> Créer Accès
-            </button>
-            <button onclick="window.location.href='login.html'" class="w-full bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3">
-                <i class="fa-solid fa-fingerprint"></i> S'identifier
-            </button>
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] space-y-4">
+            <button onclick="window.location.href='register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">Créer Accès</button>
+            <button onclick="window.location.href='login.html'" class="w-full bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">S'identifier</button>
         </div>
 
-        <nav class="flex-1 px-4 lg:px-6 py-6 space-y-2 overflow-y-auto no-scrollbar">
-            <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.4em] px-4 mb-4">Menu Principal</p>
+        <nav class="flex-1 px-4 lg:px-6 py-8 space-y-2 overflow-y-auto no-scrollbar">
             <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
             </button>
@@ -104,72 +121,82 @@
             <button class="w-full flex items-center gap-5 p-4 rounded-2xl nav-active text-white">
                 <i class="fa-solid fa-vault text-xl text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Mon Inventaire</span>
             </button>
-            <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+            
+            <div class="h-px bg-white/[0.03] my-8 mx-4"></div>
+            
             <button onclick="window.location.href='guide.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-circle-info text-xl"></i> <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
             </button>
         </nav>
 
-        <div class="p-8 bg-black/40 border-t border-white/[0.03]">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">System Online</span>
-            </div>
+        <div class="p-8 bg-black/40 border-t border-white/[0.03] flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">System Online</span>
         </div>
     </aside>
 
-    <main class="main-content flex-1 ml-0 lg:ml-80 p-6 md:p-12 transition-all min-h-screen">
-        <div class="max-w-6xl mx-auto pt-20 lg:pt-0 animate-fade">
+    <main class="main-container pt-[140px] lg:pt-0">
+        <div class="max-w-6xl mx-auto w-full p-6 md:p-12 animate-fade flex-1">
             
-            <div class="relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#0d1117]/60 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/[0.03] shadow-2xl mb-12">
+            <div class="relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#0d1117]/80 backdrop-blur-xl p-8 lg:p-10 rounded-[3rem] border border-white/[0.03] shadow-2xl mb-12">
                 <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-3">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></span>
                         <p class="text-[10px] text-emerald-500 font-black uppercase tracking-[0.3em]">Coffre Sécurisé</p>
                     </div>
-                    <h2 class="text-4xl font-black text-white uppercase tracking-tighter italic">Mon <span class="text-indigo-500">Coffre-Fort</span></h2>
+                    <h2 class="text-4xl md:text-5xl font-[1000] text-white uppercase tracking-tighter italic leading-none">Mon <span class="text-indigo-500">Coffre-Fort</span></h2>
                 </div>
-                <div class="flex items-center gap-6 bg-black/40 p-4 px-6 rounded-3xl border border-white/[0.05] min-w-[240px]">
+
+                <div class="relative z-10 flex items-center gap-6 bg-black/40 p-5 px-8 rounded-[2rem] border border-white/[0.05] min-w-[280px] w-full md:w-auto">
                     <div class="text-right flex-1">
                         <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1">Valeur Estimée</p>
-                        <p id="vault-value" class="text-2xl font-black text-white tracking-tighter">0.00€</p>
+                        <p id="vault-value" class="text-3xl font-mono font-black text-white tracking-tighter">0.00€</p>
                     </div>
-                    <div class="w-14 h-14 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-indigo-400 border border-indigo-500/30">
+                    <div class="w-16 h-16 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-indigo-500 border border-indigo-500/20">
                         <i class="fa-solid fa-vault text-2xl"></i>
                     </div>
                 </div>
             </div>
 
             <div id="inventory-display">
-                <div id="state-logged-out" class="text-center py-24 md:py-32 bg-indigo-950/5 rounded-[3.5rem] border border-indigo-500/10 px-6 backdrop-blur-sm">
-                    <div class="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.1)]">
-                        <i class="fa-solid fa-lock text-4xl text-indigo-500"></i>
+                <div id="state-logged-out" class="text-center py-24 md:py-32 bg-indigo-950/5 rounded-[3.5rem] border border-indigo-500/10 px-6 backdrop-blur-sm shadow-2xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-24 h-24 bg-indigo-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 shadow-[0_0_40px_rgba(79,70,229,0.15)] transform rotate-3">
+                            <i class="fa-solid fa-lock text-4xl text-indigo-500"></i>
+                        </div>
+                        <h3 class="text-3xl font-[1000] text-white uppercase tracking-tighter italic mb-4">Accès <span class="text-indigo-500">Bloqué</span></h3>
+                        <p class="text-slate-500 max-w-md mx-auto mb-10 text-sm font-medium leading-relaxed">Connectez-vous à votre terminal pour déchiffrer vos actifs et consulter votre inventaire sécurisé.</p>
+                        
+                        <button onclick="window.location.href='login.html'" class="bg-white text-black px-12 py-5 rounded-2xl font-[1000] uppercase text-[11px] tracking-[0.3em] hover:bg-indigo-600 hover:text-white transition-all shadow-xl active:scale-95">
+                            S'identifier maintenant
+                        </button>
                     </div>
-                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter italic mb-4">Accès Bloqué</h3>
-                    <p class="text-slate-500 max-w-sm mx-auto mb-10 font-medium">Connectez-vous à votre terminal pour déchiffrer vos actifs et consulter votre inventaire.</p>
-                    <button onclick="window.location.href='login.html'" class="bg-white text-black px-12 py-5 rounded-2xl font-[1000] uppercase text-xs tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-all shadow-xl">
-                        S'identifier maintenant
-                    </button>
                 </div>
             </div>
 
         </div>
 
-        <footer class="mt-20 p-10 border-t border-white/[0.03] text-center text-slate-600">
+        <footer class="p-8 border-t border-white/[0.03] text-center text-slate-600 mt-auto w-full">
             <p class="text-[10px] font-black uppercase tracking-[0.4em] italic">© 2026 IRYON NETWORK TERMINAL</p>
         </footer>
     </main>
 
     <script>
-        function toggleMenu() {
+        function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const icon = document.getElementById('menu-icon');
             sidebar.classList.toggle('open');
-            if (sidebar.classList.contains('open')) {
+            
+            if(sidebar.classList.contains('open')) {
                 icon.classList.replace('fa-bars-staggered', 'fa-xmark');
+                document.body.style.overflow = 'hidden';
             } else {
                 icon.classList.replace('fa-xmark', 'fa-bars-staggered');
+                document.body.style.overflow = 'auto';
             }
         }
     </script>
