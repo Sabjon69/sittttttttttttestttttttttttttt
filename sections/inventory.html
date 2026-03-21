@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IRYON | Guide Protocolaire</title>
+    <title>IRYON | Mon Coffre</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-
         .bg-grid {
             position: fixed; inset: 0;
             background-image: radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.05) 1px, transparent 0);
@@ -69,7 +67,12 @@
             background: rgba(255, 255, 255, 0.02); 
             backdrop-filter: blur(20px); 
             border: 1px solid rgba(255, 255, 255, 0.05); 
-            transition: all 0.4s ease;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
         #menu-overlay {
@@ -77,8 +80,6 @@
             background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
         }
         #menu-overlay.active { display: block; }
-
-        details summary::-webkit-details-marker { display: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -122,20 +123,23 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto no-scrollbar mt-4">
-            <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
-            </button>
-            <button onclick="window.location.href='live.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-chart-line text-lg"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
-            </button>
-            <button onclick="window.location.href='inventory.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-vault text-lg"></i> <span class="font-bold text-sm tracking-wide">Mon Coffre</span>
-            </button>
-            <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
-            <button class="w-full flex items-center gap-4 p-3.5 rounded-xl nav-active text-white">
-                <i class="fa-solid fa-circle-info text-lg text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
-            </button>
-        </nav>
+    <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+        <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
+    </button>
+    <button onclick="window.location.href='live.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+        <i class="fa-solid fa-chart-line text-lg"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
+    </button>
+    
+    <button onclick="window.location.href='inventory.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl nav-active text-white">
+        <i class="fa-solid fa-vault text-lg text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Mon Coffre</span>
+    </button>
+    
+    <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+    
+    <button onclick="window.location.href='guide.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+        <i class="fa-solid fa-circle-info text-lg"></i> <span class="font-bold text-sm tracking-wide">Aide & Guide</span>
+    </button>
+</nav>
 
         <div class="p-6 border-t border-white/[0.03]">
             <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-600/5 border border-indigo-500/10">
@@ -146,67 +150,40 @@
     </aside>
 
     <main class="main-container">
-        <div class="max-w-5xl mx-auto p-6 md:p-16 lg:p-24 w-full flex-1">
-            <div class="mb-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Documentation</span>
-                    <span class="text-slate-600 text-[10px] font-bold uppercase tracking-widest italic">Ver. 2026.1</span>
-                </div>
-                <h1 class="text-5xl md:text-8xl font-[1000] text-white uppercase tracking-tighter italic leading-[0.85] mb-8">
-                    Guide du <br><span class="text-indigo-500">Protocole</span>
+        <div class="p-6 md:p-12 lg:p-20 w-full max-w-7xl mx-auto">
+            
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-6xl font-[1000] text-white uppercase tracking-tighter italic leading-none mb-4">
+                    Mon <span class="text-indigo-500">Coffre Fort</span>
                 </h1>
-                <p class="text-slate-400 max-w-2xl text-lg md:text-xl font-medium leading-relaxed">
-                    Maîtrisez les outils du terminal IRYON pour sécuriser vos acquisitions sur les flux haute fréquence.
-                </p>
+                <p class="text-slate-500 font-medium">Visualisez et gérez vos actifs sécurisés sur le réseau IRYON.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
-                <div class="glass-card p-10 rounded-[3rem] hover:border-indigo-500/30 group">
-                    <div class="w-16 h-16 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-500 text-3xl font-black italic mb-8 group-hover:scale-110 transition-transform">01</div>
-                    <h3 class="text-2xl font-black uppercase italic text-white mb-4">Liaison Blockchain</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed font-medium">
-                        Créez un accès unique via le terminal. Ce protocole sécurise vos actifs et permet l'inscription immédiate de vos transactions sur le registre décentralisé.
-                    </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-indigo-500">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Valeur Totale Est.</p>
+                    <h3 class="text-3xl font-black text-white tracking-tighter italic">0.00 €</h3>
                 </div>
-
-                <div class="glass-card p-10 rounded-[3rem] hover:border-emerald-500/30 group">
-                    <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 text-3xl font-black italic mb-8 group-hover:scale-110 transition-transform">02</div>
-                    <h3 class="text-2xl font-black uppercase italic text-white mb-4">Flux Quantum Live</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed font-medium">
-                        Le marché évolue en temps réel. Les prix sont calculés par un algorithme d'incrément automatique. L'offre la plus rapide verrouille l'actif instantanément.
-                    </p>
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-emerald-500">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Actifs Possédés</p>
+                    <h3 class="text-3xl font-black text-white tracking-tighter italic">0</h3>
+                </div>
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-amber-500">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Transactions 24h</p>
+                    <h3 class="text-3xl font-black text-white tracking-tighter italic">0</h3>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <h2 class="text-3xl font-[1000] uppercase italic text-white mb-10 flex items-center gap-4">
-                    <i class="fa-solid fa-circle-question text-indigo-500"></i> FAQ Terminal
-                </h2>
-                
-                <details class="glass-card rounded-[2.5rem] p-8 cursor-pointer group">
-                    <summary class="font-black text-base uppercase tracking-tight list-none flex justify-between items-center text-white">
-                        Comment retirer mes gains ?
-                        <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-all text-indigo-500"></i>
-                    </summary>
-                    <div class="mt-8 pt-8 border-t border-white/5 text-slate-400 text-sm leading-relaxed font-medium">
-                        Après confirmation d'une vente, vos crédits sont transférés dans votre balance sécurisée. Vous pouvez demander un retrait immédiat vers votre Wallet ou compte bancaire via votre profil utilisateur.
-                    </div>
-                </details>
-                
-                <details class="glass-card rounded-[2.5rem] p-8 cursor-pointer group">
-                    <summary class="font-black text-base uppercase tracking-tight list-none flex justify-between items-center text-white">
-                        Qu'est-ce que le mode Quantum ?
-                        <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-all text-indigo-500"></i>
-                    </summary>
-                    <div class="mt-8 pt-8 border-t border-white/5 text-slate-400 text-sm leading-relaxed font-medium">
-                        Il s'agit de notre moteur d'exécution ultra-basse latence. Il garantit qu'aucune offre ne peut être doublée et que chaque utilisateur dispose d'une priorité équitable basée sur la milliseconde de clic.
-                    </div>
-                </details>
+
+            <div class="glass-card rounded-[3rem] p-12 md:p-32 flex flex-col items-center justify-center text-center border-dashed border-2 border-white/5">
+                <div class="w-24 h-24 bg-indigo-500/5 rounded-full flex items-center justify-center mb-8 border border-indigo-500/10">
+                    <i class="fa-solid fa-box-open text-4xl text-indigo-500/30"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white uppercase italic tracking-tighter mb-4">Votre coffre est vide</h2>
+                <p class="text-slate-500 max-w-sm mx-auto mb-8 font-medium">Vous n'avez pas encore acquis d'actifs. Rendez-vous sur le marché live pour lancer vos premières offres.</p>
+                <button onclick="window.location.href='live.html'" class="px-10 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-[0_0_30px_rgba(79,70,229,0.3)]">Explorer le Marché</button>
             </div>
 
-            <footer class="mt-32 py-12 border-t border-white/[0.03] text-center">
-                <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] italic">© 2026 IRYON NETWORK | PROTOCOL DOCUMENTATION</p>
-            </footer>
         </div>
     </main>
 
