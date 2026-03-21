@@ -100,31 +100,57 @@ function applyFilter(category, button) {
 
 
 // --- RENDU DU MARCHÉ (LIVE) ---
-function renderMarket() {
+// --- RENDU DU MARCHÉ (LIVE) ---
+async function renderMarket() {
     const grid = document.getElementById('market-grid');
     if (!grid) return;
 
-    grid.innerHTML = State.auctions.map(auc => `
-        <div class="glass-panel p-6 rounded-[2rem] border border-white/5 hover:border-indigo-500/30 transition-all group">
-            <div class="flex justify-between items-start mb-6">
-                <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-2xl text-indigo-400 border border-white/5">
-                    <i class="fa-solid ${auc.icon}"></i>
+    try {
+        // 1. On récupère les données fraîches du serveur Node
+        const response = await fetch('/api/assets');
+        const assets = await response.json();
+
+        // 2. On met à jour l'état global pour que le moteur de prix fonctionne
+        State.auctions = assets;
+
+        // 3. On génère le HTML (Attention aux noms : current_price, name, category)
+        grid.innerHTML = State.auctions.map(auc => {
+            // Sécurité : on s'assure que les chiffres sont bien des nombres
+            const price = parseFloat(auc.current_price || auc.current || 0);
+            
+            return `
+            <div class="glass-panel p-6 rounded-[2rem] border border-white/5 hover:border-indigo-500/30 transition-all group">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-2xl text-indigo-400 border border-white/5">
+                        <i class="fa-solid ${auc.icon || 'fa-box'}"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
+                        ${auc.category || auc.cat}
+                    </span>
                 </div>
-                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">${auc.cat}</span>
-            </div>
-            <h3 class="text-xl font-black text-white mb-2 tracking-tight">${auc.title}</h3>
-            <p class="text-slate-400 text-xs mb-6 line-clamp-2">${auc.desc}</p>
-            <div class="bg-black/40 p-5 rounded-2xl border border-white/5 flex justify-between items-center mb-6">
-                <div>
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">Prix Actuel</p>
-                    <p id="price-${auc.id}" class="text-2xl font-mono font-bold text-indigo-300 tracking-tighter">${auc.current.toFixed(2)}€</p>
+                
+                <h3 class="text-xl font-black text-white mb-2 tracking-tight">${auc.name || auc.title}</h3>
+                <p class="text-slate-400 text-xs mb-6 line-clamp-2">${auc.description || auc.desc}</p>
+                
+                <div class="bg-black/40 p-5 rounded-2xl border border-white/5 flex justify-between items-center mb-6">
+                    <div>
+                        <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">Prix Actuel</p>
+                        <p id="price-${auc.id}" class="text-2xl font-mono font-bold text-indigo-300 tracking-tighter">
+                            ${price.toFixed(2)}€
+                        </p>
+                    </div>
                 </div>
+                
+                <button onclick="buyItem(${auc.id})" class="w-full bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 py-4 rounded-xl font-black uppercase text-sm hover:bg-indigo-600 hover:text-white transition-all shadow-xl active:scale-95">
+                    Acquérir
+                </button>
             </div>
-            <button onclick="buyItem(${auc.id})" class="w-full bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 py-4 rounded-xl font-black uppercase text-sm hover:bg-indigo-600 hover:text-white transition-all shadow-xl active:scale-95">
-                Acquérir
-            </button>
-        </div>
-    `).join('');
+        `}).join('');
+
+    } catch (error) {
+        console.error("Erreur de liaison Marché:", error);
+        grid.innerHTML = `<p class="text-red-500 font-mono text-center p-10">⚠️ ÉCHEC DE RÉCUPÉRATION DES ACTIFS</p>`;
+    }
 }
 
 

@@ -103,6 +103,13 @@
         #menu-overlay.active { display: block; }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Animation Success */
+        @keyframes success-pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-mode { animation: success-pop 0.5s forwards; border-color: #10b981 !important; }
     </style>
 </head>
 <body class="antialiased">
@@ -168,7 +175,7 @@
     <main class="main-container">
         <div class="max-w-4xl mx-auto px-4 py-8 lg:py-16">
             
-            <div class="quantum-card rounded-[2rem] lg:rounded-[3rem] overflow-hidden relative shadow-2xl border border-white/5">
+            <div id="quantum-form-container" class="quantum-card rounded-[2rem] lg:rounded-[3rem] overflow-hidden relative shadow-2xl border border-white/5">
                 <div class="scan-bar"></div>
                 <div class="scanner"></div>
 
@@ -183,25 +190,25 @@
                         </div>
                     </div>
 
-                    <form class="space-y-8">
+                    <form id="audit-form" class="space-y-8">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                             <div class="space-y-5">
                                 <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">01. État Civil</h3>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <input type="text" placeholder="NOM" class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold uppercase tracking-widest">
-                                    <input type="text" placeholder="PRÉNOM" class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold">
+                                    <input type="text" id="reg-nom" placeholder="NOM" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold uppercase tracking-widest outline-none">
+                                    <input type="text" id="reg-prenom" placeholder="PRÉNOM" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold outline-none">
                                 </div>
                                 <div class="relative">
-                                    <input type="date" class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono uppercase">
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-slate-500 font-black pointer-events-none uppercase">Date de Naissance</span>
+                                    <input type="date" id="reg-date" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono uppercase outline-none">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-slate-500 font-black pointer-events-none uppercase bg-black px-2">Date de Naissance</span>
                                 </div>
                             </div>
                             
                             <div class="space-y-5">
                                 <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">02. Communication</h3>
                                 <div class="space-y-4">
-                                    <input type="email" placeholder="EMAIL DE RÉCUPÉRATION" class="w-full p-4 lg:p-5 rounded-xl text-sm">
-                                    <input type="tel" placeholder="+33 _ __ __ __ __" class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono">
+                                    <input type="email" id="reg-email" placeholder="EMAIL DE RÉCUPÉRATION" required class="w-full p-4 lg:p-5 rounded-xl text-sm outline-none">
+                                    <input type="tel" id="reg-tel" placeholder="+33 _ __ __ __ __" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono outline-none">
                                 </div>
                             </div>
                         </div>
@@ -209,33 +216,42 @@
                         <div class="pt-8 border-t border-white/5">
                             <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3 mb-6">03. Documents Requis</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
                                     <i class="fa-solid fa-id-card text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">ID Card / Passport</p>
-                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">ID Card / Passport</p>
+                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
+                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+                                    </div>
                                 </div>
                                 
-                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
                                     <i class="fa-solid fa-face-viewfinder text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">Scan Facial Live</p>
-                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">Scan Facial Live</p>
+                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
+                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+                                    </div>
                                 </div>
 
-                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
                                     <i class="fa-solid fa-file-invoice text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">Proof of Address</p>
-                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">Proof of Address</p>
+                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
+                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
 
                         <div class="pt-6">
-                            <button type="button" class="w-full py-5 lg:py-8 bg-white text-black font-black uppercase text-[10px] lg:text-xs tracking-[0.4em] rounded-2xl lg:rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-[0.98]">
-                                Synchroniser Profil Quantum
+                            <button type="button" id="submit-audit" onclick="executeAuditSubmission()" class="w-full py-5 lg:py-8 bg-white text-black font-[1000] uppercase text-[10px] lg:text-xs tracking-[0.4em] rounded-2xl lg:rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-3">
+                                <i class="fa-solid fa-bolt"></i> Synchroniser Profil Quantum
                             </button>
-                            <p class="text-center text-[9px] text-slate-600 uppercase font-bold mt-6 tracking-[0.2em]">
-                                En cliquant, vous acceptez les protocoles de sécurité Iryon.
-                            </p>
+                            <p id="error-msg" class="text-center text-red-500 text-[10px] font-bold uppercase mt-4 hidden">Veuillez compléter tous les protocoles.</p>
                         </div>
                     </form>
                 </div>
@@ -251,7 +267,76 @@
     </main>
 
     <script>
-        // NAVIGATION MOBILE & OVERLAY
+        // --- GESTION DES FICHIERS ---
+        document.querySelectorAll('.file-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const card = this.closest('.file-card');
+                const label = card.querySelector('.file-label');
+                const preview = card.querySelector('.file-preview');
+                
+                if (this.files && this.files[0]) {
+                    // Masquer l'icône et le texte, afficher le check vert
+                    card.classList.remove('border-white/5');
+                    card.classList.add('border-emerald-500/50');
+                    preview.style.display = 'flex';
+                    label.innerText = "CHARGÉ : " + this.files[0].name.substring(0, 10) + "...";
+                    label.classList.add('text-emerald-400');
+                    label.classList.remove('text-slate-500');
+                }
+            });
+        });
+
+        // --- SUBMISSION LOGIC ---
+        async function executeAuditSubmission() {
+            const btn = document.getElementById('submit-audit');
+            const form = document.getElementById('audit-form');
+            const errorMsg = document.getElementById('error-msg');
+            const inputs = form.querySelectorAll('input[required]');
+            
+            // 1. Validation de base
+            let isValid = true;
+            inputs.forEach(input => {
+                if(!input.value) {
+                    input.classList.add('border-red-500/50');
+                    isValid = false;
+                } else {
+                    input.classList.remove('border-red-500/50');
+                }
+            });
+
+            if(!isValid) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            // 2. Effet visuel "Hacker"
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> CRYPTAGE DU PROFIL...';
+
+            // 3. Simulation de traitement Iryon
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-shield-check fa-beat mr-2"></i> VÉRIFICATION RÉSEAU...';
+                
+                setTimeout(() => {
+                    // Transition vers succès
+                    btn.classList.replace('bg-white', 'bg-emerald-500');
+                    btn.classList.replace('text-black', 'text-white');
+                    btn.innerHTML = '<i class="fa-solid fa-check-double"></i> ACCÈS AUTORISÉ';
+                    
+                    const container = document.getElementById('quantum-form-container');
+                    container.classList.add('success-mode');
+
+                    // 4. Redirection
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                }, 2000);
+            }, 1500);
+        }
+
+        // --- SIDEBAR ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('menu-overlay');
@@ -262,10 +347,8 @@
             
             if(sidebar.classList.contains('open')) {
                 icon.classList.replace('fa-bars-staggered', 'fa-xmark');
-                document.body.style.overflow = 'hidden';
             } else {
                 icon.classList.replace('fa-xmark', 'fa-bars-staggered');
-                document.body.style.overflow = 'auto';
             }
         }
     </script>
