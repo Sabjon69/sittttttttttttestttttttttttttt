@@ -11,13 +11,21 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
         
+        :root {
+            --primary: #6366f1;
+            --bg: #020202;
+        }
+
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #020202; 
+            background-color: var(--bg); 
             color: #e2e8f0; 
             margin: 0;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
 
         .bg-grid {
             position: fixed; inset: 0;
@@ -26,91 +34,87 @@
             z-index: -1;
         }
 
-        /* --- NAVIGATION RESPONSIVE --- */
+        /* --- NAVIGATION --- */
         .sidebar-fixed {
             width: 320px;
             height: 100vh;
             background: #050505;
             border-right: 1px solid rgba(255, 255, 255, 0.03);
-            position: fixed;
-            left: 0;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column;
+            z-index: 2000;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .main-container {
             margin-left: 320px;
-            width: auto;
             min-height: 100vh;
             transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
         }
 
         @media (max-width: 1024px) {
-            .sidebar-fixed { transform: translateX(-100%); }
-            .sidebar-fixed.open { transform: translateX(0); width: 280px; }
+            .sidebar-fixed { transform: translateX(-100%); width: 280px; }
+            .sidebar-fixed.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.9); }
             .main-container { margin-left: 0; width: 100%; }
         }
 
-        .nav-active { background: rgba(99, 102, 241, 0.08); border-left: 4px solid #6366f1; color: white !important; }
-        
+        .nav-active { 
+            background: rgba(99, 102, 241, 0.08); 
+            border-left: 4px solid var(--primary); 
+            color: white !important; 
+        }
+
         .glass-card { 
             background: rgba(255, 255, 255, 0.02); 
             backdrop-filter: blur(20px); 
             border: 1px solid rgba(255, 255, 255, 0.05); 
+            transition: all 0.4s ease;
         }
 
-        @keyframes viewEnter {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .dot-live { 
+            width: 8px; height: 8px; background: var(--primary); border-radius: 50%; 
+            box-shadow: 0 0 10px var(--primary); animation: pulse 2s infinite; 
         }
-        .animate-view-enter { animation: viewEnter 0.5s ease-out forwards; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } }
 
-        .dot-live {
-            width: 8px; height: 8px;
-            background: #6366f1;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #6366f1;
-            animation: pulse-indigo 2s infinite;
+        #menu-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
         }
+        #menu-overlay.active { display: block; }
 
-        @keyframes pulse-indigo {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-        }
-
-        summary::-webkit-details-marker { display: none; }
+        details summary::-webkit-details-marker { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="antialiased">
 
+    <div id="menu-overlay" onclick="toggleSidebar()"></div>
     <div class="bg-grid"></div>
 
     <header class="lg:hidden flex items-center justify-between p-6 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[1100] min-h-[140px]">
         <div class="flex items-center gap-6" onclick="window.location.href='../index.html'">
-            <div class="w-[100px] h-[100px] bg-indigo-500/5 border border-indigo-500/20 rounded-[2rem] flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(79,70,229,0.2)]">
-                <img src="assets/logo.png" alt="Logo IRYON" class="w-full h-full object-contain p-1 transform scale-150">
+            <div class="w-[100px] h-[100px] bg-indigo-500/5 border border-indigo-500/20 rounded-[2rem] flex items-center justify-center overflow-hidden">
+                <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1 transform scale-150">
             </div>
-            
             <div class="flex flex-col">
                 <h1 class="font-[1000] uppercase tracking-tighter text-white italic text-4xl leading-[0.8] mb-2">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
                 <div class="flex items-center gap-2">
                     <div class="dot-live"></div>
-                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] italic">Quantum Live</span>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] italic">Guide System</span>
                 </div>
             </div>
         </div>
-
         <button onclick="toggleSidebar()" class="w-16 h-16 flex items-center justify-center rounded-[1.5rem] bg-white/5 border border-white/10 text-white text-3xl">
             <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
         </button>
     </header>
 
-    <aside id="sidebar" class="sidebar-fixed flex flex-col bg-[#050505]">
+    <aside id="sidebar" class="sidebar-fixed">
         <div class="p-8 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-start min-h-[160px]">
-            <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full pointer-events-none"></div>
+            <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full"></div>
             <div class="flex items-center gap-6 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
                 <div class="w-16 h-16 lg:w-20 lg:h-20 bg-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden">
                     <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-150 transition-transform duration-700 group-hover:scale-[1.7]">
@@ -122,6 +126,11 @@
             </div>
         </div>
         
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] space-y-4">
+            <button onclick="window.location.href='register.html'" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">Créer Accès</button>
+            <button onclick="window.location.href='login.html'" class="w-full bg-white/5 border border-white/10 text-slate-400 py-4 rounded-2xl text-[11px] font-[1000] uppercase tracking-widest transition-all">S'identifier</button>
+        </div>
+
         <nav class="flex-1 px-4 lg:px-6 py-8 space-y-2 overflow-y-auto no-scrollbar">
             <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
@@ -145,73 +154,67 @@
     </aside>
 
     <main class="main-container">
-        <div class="max-w-4xl mx-auto p-6 md:p-20 animate-view-enter pt-[160px] lg:pt-20">
+        <div class="max-w-5xl mx-auto p-6 md:p-16 lg:p-24 w-full flex-1">
             
-            <div class="mb-16">
-                <p class="text-indigo-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4">Documentation Système</p>
-                <h1 class="text-4xl md:text-7xl font-[1000] text-white uppercase tracking-tighter italic leading-none">
-                    Guide du <span class="text-indigo-500">Protocole</span>
+            <div class="mb-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Documentation</span>
+                    <span class="text-slate-600 text-[10px] font-bold uppercase tracking-widest italic">Ver. 2026.1</span>
+                </div>
+                <h1 class="text-5xl md:text-8xl font-[1000] text-white uppercase tracking-tighter italic leading-[0.85] mb-8">
+                    Guide du <br><span class="text-indigo-500">Protocole</span>
                 </h1>
-                <p class="text-slate-500 mt-8 text-lg md:text-xl font-medium leading-relaxed">
-                    Apprenez à maîtriser le terminal IRYON et optimisez vos chances d'acquisition sur les actifs haute fréquence.
+                <p class="text-slate-400 max-w-2xl text-lg md:text-xl font-medium leading-relaxed">
+                    Maîtrisez les outils du terminal IRYON pour sécuriser vos acquisitions sur les flux haute fréquence.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 gap-6">
-                <div class="glass-card p-10 rounded-[2.5rem] group hover:border-indigo-500/30 transition-all relative overflow-hidden">
-                    <div class="flex flex-col md:flex-row items-start gap-8 relative z-10">
-                        <div class="w-16 h-16 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-indigo-500 text-3xl font-[1000] shrink-0 border border-indigo-500/20">01</div>
-                        <div>
-                            <h3 class="text-2xl font-black uppercase italic text-white mb-4">Liaison Blockchain</h3>
-                            <p class="text-slate-400 text-base leading-relaxed font-medium">
-                                Pour interagir avec le marché, vous devez d'abord créer un accès via l'onglet <strong>"S'IDENTIFIER / CRÉER ACCÈS"</strong>. Ce protocole sécurise vos futurs actifs et permet la validation instantanée des transactions.
-                            </p>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+                <div class="glass-card p-10 rounded-[3rem] hover:border-indigo-500/30 group">
+                    <div class="w-16 h-16 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-500 text-3xl font-black italic mb-8 group-hover:scale-110 transition-transform">01</div>
+                    <h3 class="text-2xl font-black uppercase italic text-white mb-4">Liaison Blockchain</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                        Créez un accès unique via le terminal. Ce protocole sécurise vos actifs et permet l'inscription immédiate de vos transactions sur le registre décentralisé.
+                    </p>
                 </div>
 
-                <div class="glass-card p-10 rounded-[2.5rem] group hover:border-emerald-500/30 transition-all relative overflow-hidden">
-                    <div class="flex flex-col md:flex-row items-start gap-8 relative z-10">
-                        <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 text-3xl font-[1000] shrink-0 border border-emerald-500/20">02</div>
-                        <div>
-                            <h3 class="text-2xl font-black uppercase italic text-white mb-4">Dynamique du Marché Live</h3>
-                            <p class="text-slate-400 text-base leading-relaxed font-medium">
-                                Le <strong>Marché Live</strong> utilise un algorithme d'incrément constant. Le prix des actifs grimpe de manière autonome chaque seconde. La rapidité d'exécution est la clé de la rentabilité.
-                            </p>
-                        </div>
-                    </div>
+                <div class="glass-card p-10 rounded-[3rem] hover:border-emerald-500/30 group">
+                    <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 text-3xl font-black italic mb-8 group-hover:scale-110 transition-transform">02</div>
+                    <h3 class="text-2xl font-black uppercase italic text-white mb-4">Flux Quantum Live</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                        Le marché évolue en temps réel. Les prix sont calculés par un algorithme d'incrément automatique. L'offre la plus rapide verrouille l'actif instantanément.
+                    </p>
                 </div>
             </div>
 
-            <div class="mt-24">
-                <h2 class="text-3xl font-[1000] uppercase italic text-white mb-10 flex items-center gap-4 leading-none">
+            <div class="space-y-6">
+                <h2 class="text-3xl font-[1000] uppercase italic text-white mb-10 flex items-center gap-4">
                     <i class="fa-solid fa-circle-question text-indigo-500"></i> FAQ Terminal
                 </h2>
-                <div class="space-y-4">
-                    <details class="glass-card rounded-[2rem] p-6 cursor-pointer group">
-                        <summary class="font-black text-sm md:text-base uppercase tracking-tight list-none flex justify-between items-center text-slate-300">
-                            Comment retirer mes gains ?
-                            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <p class="text-slate-500 text-sm mt-6 leading-relaxed border-t border-white/5 pt-6 font-medium">
-                            Une fois la vente confirmée, vos fonds sont transférés vers votre balance. Vous pouvez initier un retrait vers votre portefeuille crypto ou virement SEPA via votre profil utilisateur.
-                        </p>
-                    </details>
-                    
-                    <details class="glass-card rounded-[2rem] p-6 cursor-pointer group">
-                        <summary class="font-black text-sm md:text-base uppercase tracking-tight list-none flex justify-between items-center text-slate-300">
-                            Qu'est-ce que le mode Quantum ?
-                            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <p class="text-slate-500 text-sm mt-6 leading-relaxed border-t border-white/5 pt-6 font-medium">
-                            C'est notre moteur d'exécution ultra-rapide qui garantit qu'aucune offre ne se chevauche, assurant une équité totale entre tous les terminaux connectés.
-                        </p>
-                    </details>
-                </div>
+                
+                <details class="glass-card rounded-[2.5rem] p-8 cursor-pointer group">
+                    <summary class="font-black text-base uppercase tracking-tight list-none flex justify-between items-center text-white">
+                        Comment retirer mes gains ?
+                        <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-all text-indigo-500"></i>
+                    </summary>
+                    <div class="mt-8 pt-8 border-t border-white/5 text-slate-400 text-sm leading-relaxed font-medium">
+                        Après confirmation d'une vente, vos crédits sont transférés dans votre balance sécurisée. Vous pouvez demander un retrait immédiat vers votre Wallet ou compte bancaire via votre profil utilisateur.
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-[2.5rem] p-8 cursor-pointer group">
+                    <summary class="font-black text-base uppercase tracking-tight list-none flex justify-between items-center text-white">
+                        Qu'est-ce que le mode Quantum ?
+                        <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-all text-indigo-500"></i>
+                    </summary>
+                    <div class="mt-8 pt-8 border-t border-white/5 text-slate-400 text-sm leading-relaxed font-medium">
+                        Il s'agit de notre moteur d'exécution ultra-basse latence. Il garantit qu'aucune offre ne peut être doublée et que chaque utilisateur dispose d'une priorité équitable basée sur la milliseconde de clic.
+                    </div>
+                </details>
             </div>
 
-            <footer class="mt-32 py-12 border-t border-white/5 text-center text-slate-600">
-                <p class="text-[10px] font-black uppercase tracking-[0.5em] italic">© 2026 IRYON NETWORK TERMINAL</p>
+            <footer class="mt-32 py-12 border-t border-white/[0.03] text-center">
+                <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] italic">© 2026 IRYON NETWORK | PROTOCOL DOCUMENTATION</p>
             </footer>
 
         </div>
@@ -220,8 +223,11 @@
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('menu-overlay');
             const icon = document.getElementById('menu-icon');
+            
             sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
             
             if(sidebar.classList.contains('open')) {
                 icon.classList.replace('fa-bars-staggered', 'fa-xmark');

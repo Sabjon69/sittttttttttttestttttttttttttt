@@ -5,19 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IRYON | Créer un Accès Quantum</title>
     
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
         
+        :root {
+            --primary: #6366f1;
+            --bg: #020202;
+        }
+
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #020202; 
+            background-color: var(--bg); 
             color: #e2e8f0; 
             margin: 0;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
         .bg-grid {
             position: fixed; inset: 0;
@@ -26,154 +34,238 @@
             z-index: -1;
         }
 
+        /* --- EFFETS SCANNER --- */
         .scanner { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(99, 102, 241, 0.02) 50%); background-size: 100% 4px; pointer-events: none; }
-        .scan-bar { width: 100%; height: 2px; background: #6366f1; position: absolute; box-shadow: 0 0 15px #6366f1; animation: move 4s infinite linear; z-index: 50; }
+        .scan-bar { width: 100%; height: 2px; background: var(--primary); position: absolute; box-shadow: 0 0 15px var(--primary); animation: move 4s infinite linear; z-index: 50; }
         @keyframes move { 0% { top: 0%; } 100% { top: 100%; } }
 
+        /* --- NAVIGATION RESPONSIVE --- */
         .sidebar-fixed {
-            width: 320px; height: 100vh; background: #050505; border-right: 1px solid rgba(255, 255, 255, 0.03);
-            position: fixed; left: 0; top: 0; z-index: 1000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 300px;
+            height: 100vh;
+            background: #050505;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column;
+            z-index: 2000;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .main-container { margin-left: 320px; transition: all 0.4s; }
+        .main-container {
+            margin-left: 300px;
+            min-height: 100vh;
+            transition: all 0.4s;
+            width: calc(100% - 300px);
+        }
 
         @media (max-width: 1024px) {
             .sidebar-fixed { transform: translateX(-100%); width: 280px; }
-            .sidebar-fixed.open { transform: translateX(0); }
-            .main-container { margin-left: 0; }
+            .sidebar-fixed.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.9); }
+            .main-container { margin-left: 0; width: 100%; padding-top: 80px; }
         }
 
-        .quantum-card { background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        input { background: #000 !important; border: 1px solid #222 !important; color: white !important; transition: 0.3s; }
-        input:focus { border-color: #6366f1 !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.1); }
-        
-        .nav-active { background: rgba(99, 102, 241, 0.08); border-left: 4px solid #6366f1; color: white !important; }
-        .dot-live { width: 8px; height: 8px; background: #6366f1; border-radius: 50%; box-shadow: 0 0 10px #6366f1; animation: pulse 2s infinite; }
+        .nav-active { 
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%); 
+            border-left: 4px solid var(--primary); 
+            color: white !important; 
+        }
+
+        /* --- FORM STYLES --- */
+        .quantum-card { 
+            background: rgba(10, 10, 10, 0.8); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+
+        input { 
+            background: rgba(0, 0, 0, 0.6) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.05) !important; 
+            color: white !important; 
+            transition: all 0.3s ease; 
+        }
+
+        input:focus { 
+            border-color: var(--primary) !important; 
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        .dot-live { 
+            width: 8px; height: 8px; background: var(--primary); border-radius: 50%; 
+            box-shadow: 0 0 10px var(--primary); animation: pulse 2s infinite; 
+        }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } }
+
+        #menu-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
+        }
+        #menu-overlay.active { display: block; }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="antialiased">
 
+    <div id="menu-overlay" onclick="toggleSidebar()"></div>
     <div class="bg-grid"></div>
 
-    <header class="lg:hidden flex items-center justify-between p-6 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[1100] min-h-[140px]">
-        <div class="flex items-center gap-6" onclick="window.location.href='../index.html'">
-            <div class="w-[100px] h-[100px] bg-indigo-500/5 border border-indigo-500/20 rounded-[2rem] flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(79,70,229,0.2)]">
-                <img src="assets/logo.png" alt="Logo IRYON" class="w-full h-full object-contain p-1 transform scale-150">
+    <header class="lg:hidden fixed top-0 left-0 w-full flex items-center justify-between px-5 py-4 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 z-[1100]">
+        <div class="flex items-center gap-4" onclick="window.location.href='../index.html'">
+            <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center overflow-hidden">
+                <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1 transform scale-125">
             </div>
             <div class="flex flex-col">
-                <h1 class="font-[1000] uppercase tracking-tighter text-white italic text-4xl leading-[0.8] mb-2">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                <h1 class="font-black uppercase tracking-tighter text-white italic text-xl leading-none">IRYON</h1>
                 <div class="flex items-center gap-2">
                     <div class="dot-live"></div>
-                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] italic">Quantum Live</span>
+                    <span class="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Identity Audit</span>
                 </div>
             </div>
         </div>
-        <button onclick="toggleSidebar()" class="w-16 h-16 flex items-center justify-center rounded-[1.5rem] bg-white/5 border border-white/10 text-white text-3xl">
+        <button onclick="toggleSidebar()" class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white text-xl">
             <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
         </button>
     </header>
 
-    <aside id="sidebar" class="sidebar-fixed flex flex-col bg-[#050505]">
-        <div class="p-8 lg:p-10 border-b border-white/[0.03] relative overflow-hidden flex items-center justify-start min-h-[160px]">
-            <div class="absolute -left-5 -top-5 w-32 h-32 bg-indigo-600/10 blur-[50px] rounded-full pointer-events-none"></div>
-            <div class="flex items-center gap-6 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
-                <div class="w-16 h-16 lg:w-20 lg:h-20 bg-white/[0.02] border border-white/10 rounded-2xl flex items-center justify-center overflow-hidden">
-                    <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-150">
+    <aside id="sidebar" class="sidebar-fixed">
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] relative overflow-hidden flex items-center">
+            <div class="absolute -left-5 -top-5 w-24 h-24 bg-indigo-600/10 blur-[40px] rounded-full"></div>
+            <div class="flex items-center gap-4 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
+                <div class="w-12 h-12 lg:w-14 lg:h-14 bg-white/[0.02] border border-white/10 rounded-xl flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-125">
                 </div>
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-[1000] text-white uppercase tracking-tighter leading-[0.85] italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                    <h1 class="text-xl lg:text-2xl font-black text-white uppercase tracking-tighter leading-none italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
                 </div>
             </div>
         </div>
         
-        <nav class="flex-1 px-4 lg:px-6 py-8 space-y-2">
-            <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-house text-xl"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
+        <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto scrollbar-hide">
+            <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
             </button>
-            <button onclick="window.location.href='live.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-chart-line text-xl"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
+            <button onclick="window.location.href='live.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-chart-line text-lg"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
             </button>
-            <button class="w-full flex items-center gap-5 p-4 rounded-2xl nav-active text-white">
-                <i class="fa-solid fa-user-plus text-xl text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Créer un Accès</span>
+            <button class="w-full flex items-center gap-4 p-3.5 rounded-xl nav-active text-white">
+                <i class="fa-solid fa-user-plus text-lg text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Créer un Accès</span>
             </button>
-            <div class="h-px bg-white/[0.03] my-8 mx-4"></div>
-            <button onclick="window.location.href='login.html'" class="w-full flex items-center gap-5 p-4 rounded-2xl text-slate-500 hover:bg-white/5 transition-all">
-                <i class="fa-solid fa-fingerprint text-xl"></i> <span class="font-bold text-sm tracking-wide">S'identifier</span>
+            <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
+            <button onclick="window.location.href='login.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+                <i class="fa-solid fa-fingerprint text-lg"></i> <span class="font-bold text-sm tracking-wide">S'identifier</span>
             </button>
         </nav>
+
+        <div class="p-6 border-t border-white/[0.03]">
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-600/5 border border-indigo-500/10">
+                <i class="fa-solid fa-shield-halved text-indigo-500"></i>
+                <p class="text-[9px] font-black text-white uppercase italic tracking-wider">Level 4 Security</p>
+            </div>
+        </div>
     </aside>
 
     <main class="main-container">
-        <div class="max-w-5xl mx-auto p-6 md:p-20">
+        <div class="max-w-4xl mx-auto px-4 py-8 lg:py-16">
             
-            <div class="quantum-card rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden relative shadow-2xl">
+            <div class="quantum-card rounded-[2rem] lg:rounded-[3rem] overflow-hidden relative shadow-2xl border border-white/5">
                 <div class="scan-bar"></div>
                 <div class="scanner"></div>
 
-                <div class="p-8 md:p-16 relative z-10">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 pb-8 border-b border-white/5">
-                        <div>
-                            <p class="text-indigo-500 font-black uppercase tracking-[0.3em] text-[10px] mb-2">Protocol de vérification niveau 4</p>
-                            <h2 class="text-4xl md:text-5xl font-[1000] uppercase tracking-tighter italic text-white">Identity <span class="text-indigo-500">Audit</span></h2>
+                <div class="p-6 lg:p-16 relative z-10">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-white/5">
+                        <div class="text-center md:text-left">
+                            <p class="text-indigo-500 font-black uppercase tracking-[0.3em] text-[10px] mb-2">Protocol de vérification</p>
+                            <h2 class="text-3xl lg:text-5xl font-[1000] uppercase tracking-tighter italic text-white leading-none">Identity <span class="text-indigo-500">Audit</span></h2>
                         </div>
-                        <i class="fa-solid fa-shield-halved text-5xl text-indigo-500/20"></i>
+                        <div class="hidden md:flex w-16 h-16 bg-white/5 rounded-2xl items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-3xl text-indigo-500/30"></i>
+                        </div>
                     </div>
 
-                    <form class="space-y-10">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            <div class="space-y-6">
+                    <form class="space-y-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                            <div class="space-y-5">
                                 <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">01. État Civil</h3>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <input type="text" placeholder="NOM" class="p-5 rounded-2xl text-sm font-bold uppercase">
-                                    <input type="text" placeholder="PRÉNOM" class="p-5 rounded-2xl text-sm font-bold">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <input type="text" placeholder="NOM" class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold uppercase tracking-widest">
+                                    <input type="text" placeholder="PRÉNOM" class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold">
                                 </div>
-                                <input type="date" class="w-full p-5 rounded-2xl text-sm font-mono">
+                                <div class="relative">
+                                    <input type="date" class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono uppercase">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-slate-500 font-black pointer-events-none uppercase">Date de Naissance</span>
+                                </div>
                             </div>
                             
-                            <div class="space-y-6">
+                            <div class="space-y-5">
                                 <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">02. Communication</h3>
-                                <input type="email" placeholder="EMAIL DE RÉCUPÉRATION" class="w-full p-5 rounded-2xl text-sm">
-                                <input type="tel" placeholder="+33 _ __ __ __ __" class="w-full p-5 rounded-2xl text-sm font-mono">
+                                <div class="space-y-4">
+                                    <input type="email" placeholder="EMAIL DE RÉCUPÉRATION" class="w-full p-4 lg:p-5 rounded-xl text-sm">
+                                    <input type="tel" placeholder="+33 _ __ __ __ __" class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-white/5">
-                            <div class="h-40 bg-black/40 rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
-                                <i class="fa-solid fa-id-card text-3xl text-slate-700 group-hover:text-indigo-500"></i>
-                                <p class="text-[8px] font-black mt-4 text-slate-500 uppercase">Pièce d'identité</p>
-                                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
-                            </div>
-                            <div class="h-40 bg-black/40 rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
-                                <i class="fa-solid fa-face-viewfinder text-3xl text-slate-700 group-hover:text-indigo-500"></i>
-                                <p class="text-[8px] font-black mt-4 text-slate-500 uppercase">Scan Facial Live</p>
-                                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
-                            </div>
-                            <div class="h-40 bg-black/40 rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/50 transition-all cursor-pointer relative">
-                                <i class="fa-solid fa-file-invoice text-3xl text-slate-700 group-hover:text-indigo-500"></i>
-                                <p class="text-[8px] font-black mt-4 text-slate-500 uppercase">Justificatif Domicile</p>
-                                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div class="pt-8 border-t border-white/5">
+                            <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3 mb-6">03. Documents Requis</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                    <i class="fa-solid fa-id-card text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
+                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">ID Card / Passport</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
+                                
+                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                    <i class="fa-solid fa-face-viewfinder text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
+                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">Scan Facial Live</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
+
+                                <div class="h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
+                                    <i class="fa-solid fa-file-invoice text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
+                                    <p class="text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter">Proof of Address</p>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
+                                </div>
                             </div>
                         </div>
 
-                        <button type="button" class="w-full py-8 bg-white text-black font-[1000] uppercase text-xs tracking-[0.5em] rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-95">
-                            Synchroniser Profil Quantum
-                        </button>
+                        <div class="pt-6">
+                            <button type="button" class="w-full py-5 lg:py-8 bg-white text-black font-black uppercase text-[10px] lg:text-xs tracking-[0.4em] rounded-2xl lg:rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-[0.98]">
+                                Synchroniser Profil Quantum
+                            </button>
+                            <p class="text-center text-[9px] text-slate-600 uppercase font-bold mt-6 tracking-[0.2em]">
+                                En cliquant, vous acceptez les protocoles de sécurité Iryon.
+                            </p>
+                        </div>
                     </form>
                 </div>
+            </div>
+
+            <div class="mt-12 text-center opacity-30">
+                <i class="fa-solid fa-fingerprint text-3xl mb-4"></i>
+                <p class="text-[8px] font-black uppercase tracking-widest leading-relaxed">
+                    Données chiffrées AES-256 • Iryon Security Stack v4.2.1
+                </p>
             </div>
         </div>
     </main>
 
     <script>
+        // NAVIGATION MOBILE & OVERLAY
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('menu-overlay');
             const icon = document.getElementById('menu-icon');
+            
             sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
             if(sidebar.classList.contains('open')) {
                 icon.classList.replace('fa-bars-staggered', 'fa-xmark');
+                document.body.style.overflow = 'hidden';
             } else {
                 icon.classList.replace('fa-xmark', 'fa-bars-staggered');
+                document.body.style.overflow = 'auto';
             }
         }
     </script>
