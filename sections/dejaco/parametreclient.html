@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRYON | Paramètres Système</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
+        
+        :root { --primary: #6366f1; --bg: #020202; --danger: #ef4444; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
+
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar { width: 280px; height: 100vh; position: fixed; left: 0; top: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 50; }
+        .main-content { margin-left: 280px; padding: 40px; }
+        
+        .nav-link { transition: all 0.3s ease; color: #64748b; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-active { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+
+        .setting-card { border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
+        .setting-card:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.02); }
+
+        input { background: rgba(0,0,0,0.4) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white; transition: all 0.3s; }
+        input:focus { border-color: var(--primary) !important; outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+
+        /* Custom Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar glass p-8 flex flex-col">
+        <div class="flex items-center gap-4 mb-12">
+            <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 object-contain">
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">Iryon <span class="text-indigo-500">Pro</span></h1>
+        </div>
+
+        <nav class="flex-1 space-y-3">
+            <a href="/client-dashboard" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="/marcher-actuel" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-shop"></i> Marché Actuel
+            </a>
+            <a href="/inventaire" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-vault"></i> Mon Inventaire
+            </a>
+            <a href="/mes-encheres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gavel"></i> Mes Enchères
+            </a>
+            <a href="/portefeuille" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-wallet"></i> Portefeuille
+            </a>
+            <a href="/parametres" class="nav-link nav-active flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gear text-indigo-500"></i> Paramètres
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="mt-auto flex items-center gap-4 p-4 text-red-500/60 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-all">
+            <i class="fa-solid fa-power-off"></i> Déconnexion
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <header class="mb-12">
+            <h2 class="text-4xl font-[1000] italic uppercase tracking-tighter">Configuration <span class="text-indigo-500">Système</span></h2>
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mt-2">Identité : <span id="current-user-tag" class="text-white">SYNCHRONISATION...</span></p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div class="glass p-10 rounded-[3rem] setting-card">
+                    <div class="flex items-center gap-8 mb-10">
+                        <div class="relative group">
+                            <div class="w-24 h-24 rounded-[2rem] bg-indigo-500/10 border-2 border-dashed border-indigo-500/30 flex items-center justify-center text-3xl text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-all cursor-pointer">
+                                <i class="fa-solid fa-user-ninja"></i>
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-white text-black rounded-full flex items-center justify-center text-xs shadow-xl"><i class="fa-solid fa-camera"></i></div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black italic uppercase">Avatar de Terminal</h3>
+                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Format recommandé : PNG, 512x512px</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-[1000] uppercase text-slate-500 tracking-widest ml-1">Terminal ID (Pseudo)</label>
+                            <input type="text" id="new-username" placeholder="Entrez un nouveau nom..." class="w-full px-6 py-4 rounded-2xl text-sm font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-[1000] uppercase text-slate-500 tracking-widest ml-1">Email de Liaison</label>
+                            <input type="email" placeholder="user@iryon.network" class="w-full px-6 py-4 rounded-2xl text-sm font-bold opacity-50 cursor-not-allowed" disabled>
+                        </div>
+                    </div>
+                    
+                    <button onclick="updateProfile()" class="mt-8 px-10 py-4 bg-indigo-600 rounded-2xl text-[10px] font-[1000] uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">
+                        Mettre à jour l'identité
+                    </button>
+                </div>
+
+                <div class="glass p-10 rounded-[3rem] setting-card">
+                    <h3 class="text-xl font-black italic uppercase mb-8 flex items-center gap-3">
+                        <i class="fa-solid fa-shield-halved text-indigo-500"></i> Cryptage & Sécurité
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center py-4 border-b border-white/5">
+                            <div>
+                                <p class="text-sm font-black uppercase italic">Double Authentification (2FA)</p>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Sécurisez vos retraits de portefeuille</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b border-white/5">
+                            <div>
+                                <p class="text-sm font-black uppercase italic">Mode Ghost (Anonyme)</p>
+                                <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Cachez vos enchères sur le marché public</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                
+                <div class="glass p-8 rounded-[3rem] border-indigo-500/20 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4"><div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div></div>
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Niveau d'Accès</p>
+                    <h4 class="text-3xl font-black italic text-white uppercase tracking-tighter">Privilégié <span class="text-indigo-500">Pro</span></h4>
+                    <p class="text-[10px] text-indigo-400 font-bold mt-4">Vérifié depuis le 22/03/2026</p>
+                </div>
+
+                <div class="glass p-8 rounded-[3rem] border-red-500/20">
+                    <h3 class="text-xs font-black uppercase text-red-500 tracking-widest mb-6 italic">Zone de Danger</h3>
+                    <div class="space-y-4">
+                        <button onclick="clearHistory()" class="w-full py-4 glass border-white/5 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">Effacer Historique</button>
+                        <button onclick="resetAccount()" class="w-full py-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">Réinitialiser le Terminal</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.onload = () => {
+            const userName = localStorage.getItem('user_name') || "Inconnu";
+            document.getElementById('current-user-tag').innerText = userName.toUpperCase();
+            document.getElementById('new-username').value = userName;
+        };
+
+        function updateProfile() {
+            const newName = document.getElementById('new-username').value;
+            if (newName.length < 3) return alert("Nom trop court");
+            
+            localStorage.setItem('user_name', newName);
+            document.getElementById('current-user-tag').innerText = newName.toUpperCase();
+            alert("Terminal ID mis à jour avec succès.");
+        }
+
+        function clearHistory() {
+            if(confirm("Effacer tout l'historique des flux ?")) {
+                alert("Historique nettoyé.");
+            }
+        }
+
+        function resetAccount() {
+            if(confirm("ATTENTION : Cette action supprimera votre inventaire et votre solde. Confirmer la suppression ?")) {
+                localStorage.clear();
+                window.location.href = "/login";
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>

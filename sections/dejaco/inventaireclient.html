@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRYON | Mon Inventaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
+        
+        :root { --primary: #6366f1; --bg: #020202; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
+
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar { width: 280px; height: 100vh; position: fixed; left: 0; top: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 50; }
+        .main-content { margin-left: 280px; padding: 40px; }
+        
+        .inventory-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+        }
+        .inventory-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-link { transition: all 0.3s ease; color: #64748b; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-active { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+
+        .empty-state {
+            border: 2px dashed rgba(255,255,255,0.05);
+            border-radius: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar glass p-8 flex flex-col">
+        <div class="flex items-center gap-4 mb-12">
+            <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 object-contain">
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">Iryon <span class="text-indigo-500">Pro</span></h1>
+        </div>
+
+        <nav class="flex-1 space-y-3">
+            <a href="/client-dashboard" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="/marcher-actuel" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-shop"></i> Marché Actuel
+            </a>
+            <a href="/inventaire" class="nav-link nav-active flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-vault text-indigo-500"></i> Mon Inventaire
+            </a>
+            <a href="/mes-encheres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gavel"></i> Mes Enchères
+            </a>
+            <a href="/portefeuille" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-wallet"></i> Portefeuille
+            </a>
+            <a href="/parametres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gear"></i> Paramètres
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="mt-auto flex items-center gap-4 p-4 text-red-500/60 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-all">
+            <i class="fa-solid fa-power-off"></i> Déconnexion
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <header class="flex justify-between items-center mb-12">
+            <div>
+                <h2 class="text-3xl font-[1000] italic uppercase tracking-tighter">Coffre <span class="text-indigo-500">Privé</span></h2>
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-1">Liste de vos actifs sécurisés</p>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="text-right glass px-6 py-2 rounded-2xl border-indigo-500/20 shadow-xl">
+                    <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Valeur Estimée</p>
+                    <p class="font-black text-white italic text-xl"><span id="total-assets-value">0</span> €</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-4 gap-6 mb-12">
+            <div class="glass p-6 rounded-[2rem] border-white/5 text-center">
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Items Totaux</p>
+                <p id="count-items" class="text-2xl font-black italic text-white">0</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/5 text-center">
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Dernière Acquisition</p>
+                <p id="last-purchase-date" class="text-lg font-black italic text-indigo-400">RÉCENT</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/5 text-center">
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Catégorie Dominante</p>
+                <p id="top-category" class="text-lg font-black italic text-white">TECH</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/5 text-center">
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Statut</p>
+                <p class="text-lg font-black italic text-emerald-500 uppercase">Protégé</p>
+            </div>
+        </div>
+
+        <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+
+        <div id="empty-inventory" class="hidden empty-state p-20 flex flex-col items-center justify-center text-center">
+            <div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/10">
+                <i class="fa-solid fa-box-open text-4xl text-slate-700"></i>
+            </div>
+            <h3 class="text-xl font-black uppercase italic text-white mb-2">Votre inventaire est vide</h3>
+            <p class="text-slate-500 text-xs font-bold max-w-xs mb-8">Remportez des enchères pour voir vos actifs apparaître ici.</p>
+            <a href="/marcher-actuel" class="px-8 py-4 bg-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all">Accéder au Marché</a>
+        </div>
+    </main>
+
+    <script>
+        function loadInventory() {
+            const inventory = JSON.parse(localStorage.getItem('user_inventory')) || [];
+            const grid = document.getElementById('inventory-grid');
+            const emptyState = document.getElementById('empty-inventory');
+            const totalValueDisplay = document.getElementById('total-assets-value');
+            const countDisplay = document.getElementById('count-items');
+
+            if (inventory.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                totalValueDisplay.innerText = "0";
+                countDisplay.innerText = "0";
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            grid.innerHTML = '';
+
+            let totalVal = 0;
+
+            inventory.forEach((item) => {
+                totalVal += parseFloat(item.price || 0);
+                grid.innerHTML += `
+                    <div class="inventory-card glass p-5 rounded-[2.5rem] border border-white/5 relative group">
+                        <div class="h-44 rounded-[2rem] bg-black/40 mb-6 flex items-center justify-center border border-white/5 relative overflow-hidden">
+                            <i class="fa-solid ${item.icon || 'fa-cube'} text-5xl text-indigo-500/20"></i>
+                            <div class="absolute top-4 right-4 px-3 py-1 bg-white/5 rounded-lg text-[8px] font-black uppercase tracking-widest">Sécurisé</div>
+                        </div>
+                        <div class="px-2">
+                            <span class="text-[8px] font-black text-indigo-500 uppercase tracking-widest">${item.category || 'DIVERS'}</span>
+                            <h3 class="text-lg font-black uppercase italic tracking-tighter mb-4 truncate">${item.title}</h3>
+                            
+                            <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-500 uppercase">Prix d'Achat</p>
+                                    <p class="text-xl font-black italic text-white">${parseFloat(item.price).toLocaleString()} €</p>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl glass flex items-center justify-center border border-white/5">
+                                    <i class="fa-solid fa-shield-halved text-emerald-500 text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalValueDisplay.innerText = totalVal.toLocaleString('fr-FR');
+            countDisplay.innerText = inventory.length;
+        }
+
+        window.onload = () => {
+            const userName = localStorage.getItem('user_name');
+            if (!userName) window.location.href = "/login";
+            loadInventory();
+        };
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>

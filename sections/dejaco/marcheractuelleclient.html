@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRYON | Marché Global Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
+        
+        :root { --primary: #6366f1; --bg: #020202; --accent: #f43f5e; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
+
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar { width: 280px; height: 100vh; position: fixed; left: 0; top: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 50; }
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        
+        .item-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .item-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15); }
+
+        .img-container { position: relative; overflow: hidden; background: #050505; }
+        .img-container::after {
+            content: ""; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.1), transparent);
+            animation: scan 4s infinite linear;
+        }
+        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
+
+        #product-modal {
+            display: none; position: fixed; inset: 0; z-index: 1000;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        #product-modal.active { display: flex; opacity: 1; }
+        
+        .nav-link { transition: all 0.3s ease; color: #64748b; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-active { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+
+        .category-pill { cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.05); }
+        .category-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="product-modal" onclick="closeModal()">
+        <div class="modal-content glass rounded-[3rem] p-10 max-w-4xl w-full mx-4 relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white text-2xl transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <div class="h-[350px] rounded-[2.5rem] bg-black/40 flex items-center justify-center border border-white/10 overflow-hidden relative">
+                        <i id="modal-icon" class="fa-solid fa-box text-[100px] text-indigo-500/20"></i>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <span id="modal-category" class="text-indigo-500 text-[10px] font-black uppercase tracking-widest mb-2 italic">CATÉGORIE</span>
+                    <h2 id="modal-title" class="text-4xl font-[1000] italic uppercase tracking-tighter mb-4">NOM DE L'ACTIF</h2>
+                    <p id="modal-desc" class="text-slate-400 text-sm leading-relaxed mb-8">Chargement de la description...</p>
+
+                    <div class="glass p-6 rounded-3xl mb-8 border-white/5">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Offre Minimale</p>
+                            <p id="modal-price" class="text-3xl font-black italic">0 €</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 font-bold">€</span>
+                            <input type="number" id="bid-amount" class="w-full bg-black/40 border border-white/10 rounded-2xl py-5 pl-12 pr-6 text-white font-bold focus:outline-none focus:border-indigo-500 transition-all" placeholder="Votre offre...">
+                        </div>
+                        <button onclick="submitBid()" class="w-full py-5 rounded-2xl bg-white text-black font-[1000] uppercase tracking-[0.3em] hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-95">
+                            Lancer la Liaison
+                        </button>
+                        <p id="bid-error" class="text-center text-red-500 text-[10px] font-black uppercase tracking-widest hidden mt-2"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="sidebar glass p-8 flex flex-col">
+        <div class="flex items-center gap-4 mb-12">
+            <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 object-contain">
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">Iryon <span class="text-indigo-500">Pro</span></h1>
+        </div>
+
+        <nav class="flex-1 space-y-3">
+            <a href="/client-dashboard" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="/marcher-actuel" class="nav-link nav-active flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-shop text-indigo-500"></i> Marché Actuel
+            </a>
+            <a href="/inventaire" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-vault"></i> Mon Inventaire
+            </a>
+            <a href="/mes-encheres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gavel"></i> Mes Enchères
+            </a>
+            <a href="/portefeuille" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-wallet"></i> Portefeuille
+            </a>
+            <a href="/parametres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+                <i class="fa-solid fa-gear"></i> Paramètres
+            </a>
+        </nav>
+
+        <button onclick="logout()" class="mt-auto flex items-center gap-4 p-4 text-red-500/60 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-all">
+            <i class="fa-solid fa-power-off"></i> Déconnexion
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <header class="flex justify-between items-start mb-12">
+            <div>
+                <h2 class="text-4xl font-[1000] italic uppercase tracking-tighter">Terminal <span class="text-indigo-500">Marché</span></h2>
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mt-2">Liaison Quantum : OK • Flux de données en temps réel</p>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="text-right glass px-6 py-3 rounded-2xl border-indigo-500/20 shadow-xl">
+                    <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Solde Disponible</p>
+                    <p class="font-black text-white italic text-2xl"><span id="display-balance">0</span> €</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-wrap gap-3 mb-12">
+            <div onclick="setCategory('all')" class="category-pill active px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Tout</div>
+            <div onclick="setCategory('Technologie')" class="category-pill px-8 py-3 rounded-xl glass text-[10px] font-black uppercase tracking-widest text-slate-500">Technologie</div>
+            <div onclick="setCategory('Automobile')" class="category-pill px-8 py-3 rounded-xl glass text-[10px] font-black uppercase tracking-widest text-slate-500">Automobile</div>
+            <div onclick="setCategory('Immobilier')" class="category-pill px-8 py-3 rounded-xl glass text-[10px] font-black uppercase tracking-widest text-slate-500">Immobilier</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="items-grid">
+            </div>
+    </main>
+
+    <script>
+        const products = [
+            { id: 1, category: 'Technologie', title: 'Quantum CPU V8', price: 1450, icon: 'fa-microchip', desc: 'Architecture 128 qubits stables pour IA haute performance.' },
+            { id: 2, category: 'Automobile', title: 'Hyperion GT-X', price: 245000, icon: 'fa-car-side', desc: '0-100 en 1.8s. Propulsion à fusion froide.' },
+            { id: 3, category: 'Immobilier', title: 'Sky Loft Sector 7', price: 1200000, icon: 'fa-building', desc: 'Penthouse haut de gamme avec vue sur la Mégalopole.' },
+            { id: 4, category: 'Technologie', title: 'Data Core X-9', price: 9800, icon: 'fa-database', desc: 'Stockage cryogénisé inviolable et cryptage militaire.' }
+        ];
+
+        let selectedProduct = null;
+        let currentCategory = 'all';
+
+        function renderItems() {
+            const grid = document.getElementById('items-grid');
+            grid.innerHTML = '';
+            const filtered = products.filter(p => currentCategory === 'all' || p.category === currentCategory);
+
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="item-card glass p-5 rounded-[2.5rem]" onclick="openModal(${p.id})">
+                        <div class="img-container h-44 rounded-[2rem] mb-6 flex items-center justify-center border border-white/5">
+                            <i class="fa-solid ${p.icon} text-5xl text-indigo-500/20"></i>
+                        </div>
+                        <div class="px-2">
+                            <span class="text-[8px] font-bold text-indigo-500 uppercase tracking-widest">${p.category}</span>
+                            <h3 class="text-lg font-black uppercase italic truncate mb-4">${p.title}</h3>
+                            <div class="flex justify-between items-end">
+                                <p class="text-xl font-black italic text-white">${p.price.toLocaleString()} €</p>
+                                <p class="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Actif</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openModal(id) {
+            selectedProduct = products.find(p => p.id === id);
+            document.getElementById('modal-title').innerText = selectedProduct.title;
+            document.getElementById('modal-category').innerText = selectedProduct.category;
+            document.getElementById('modal-desc').innerText = selectedProduct.desc;
+            document.getElementById('modal-price').innerText = selectedProduct.price.toLocaleString() + ' €';
+            document.getElementById('modal-icon').className = `fa-solid ${selectedProduct.icon} text-[100px] text-indigo-500/20`;
+            document.getElementById('bid-amount').value = selectedProduct.price + 500;
+            document.getElementById('bid-error').classList.add('hidden');
+            document.getElementById('product-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+        }
+
+        function submitBid() {
+            const bidVal = parseInt(document.getElementById('bid-amount').value);
+            const balance = parseFloat(localStorage.getItem('user_balance')) || 0;
+            const errorElement = document.getElementById('bid-error');
+
+            if (bidVal <= selectedProduct.price) {
+                errorElement.innerText = "L'OFFRE EST TROP BASSE";
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            if (bidVal > balance) {
+                errorElement.innerText = "CRÉDITS INSUFFISANTS";
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            // Mise à jour Solde
+            const newBalance = balance - bidVal;
+            localStorage.setItem('user_balance', newBalance);
+
+            // Mise à jour Inventaire
+            let inventory = JSON.parse(localStorage.getItem('user_inventory')) || [];
+            inventory.push({
+                ...selectedProduct,
+                price: bidVal,
+                purchaseDate: new Date().toLocaleDateString('fr-FR')
+            });
+            localStorage.setItem('user_inventory', JSON.stringify(inventory));
+
+            alert("TRANSFERT RÉUSSI : L'actif est maintenant dans votre coffre.");
+            window.location.href = "/inventaire";
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-pill').forEach(p => {
+                p.classList.remove('active');
+                if(p.innerText.toLowerCase().includes(cat.toLowerCase()) || (cat === 'all' && p.innerText === 'TOUT')) p.classList.add('active');
+            });
+            renderItems();
+        }
+
+        window.onload = () => {
+            const b = localStorage.getItem('user_balance') || 0;
+            document.getElementById('display-balance').innerText = parseFloat(b).toLocaleString('fr-FR');
+            renderItems();
+        };
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>

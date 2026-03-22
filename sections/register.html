@@ -101,15 +101,6 @@
             background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
         }
         #menu-overlay.active { display: block; }
-
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        
-        /* Animation Success */
-        @keyframes success-pop {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .success-mode { animation: success-pop 0.5s forwards; border-color: #10b981 !important; }
     </style>
 </head>
 <body class="antialiased">
@@ -118,9 +109,9 @@
     <div class="bg-grid"></div>
 
     <header class="lg:hidden fixed top-0 left-0 w-full flex items-center justify-between px-5 py-4 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 z-[1100]">
-        <div class="flex items-center gap-4" onclick="window.location.href='../index.html'">
+        <div class="flex items-center gap-4" onclick="window.location.href='/register'">
             <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center overflow-hidden">
-                <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1 transform scale-125">
+                <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1 transform scale-125">
             </div>
             <div class="flex flex-col">
                 <h1 class="font-black uppercase tracking-tighter text-white italic text-xl leading-none">IRYON</h1>
@@ -138,9 +129,9 @@
     <aside id="sidebar" class="sidebar-fixed">
         <div class="p-6 lg:p-8 border-b border-white/[0.03] relative overflow-hidden flex items-center">
             <div class="absolute -left-5 -top-5 w-24 h-24 bg-indigo-600/10 blur-[40px] rounded-full"></div>
-            <div class="flex items-center gap-4 group cursor-pointer relative z-10" onclick="window.location.href='../index.html'">
+            <div class="flex items-center gap-4 group cursor-pointer relative z-10" onclick="window.location.href='/register'">
                 <div class="w-12 h-12 lg:w-14 lg:h-14 bg-white/[0.02] border border-white/10 rounded-xl flex items-center justify-center shadow-2xl overflow-hidden">
-                    <img src="assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-125">
+                    <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-125">
                 </div>
                 <div>
                     <h1 class="text-xl lg:text-2xl font-black text-white uppercase tracking-tighter leading-none italic">IRYON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
@@ -148,28 +139,21 @@
             </div>
         </div>
         
-        <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto scrollbar-hide">
-            <button onclick="window.location.href='../index.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+        <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto">
+            <button onclick="window.location.href='/'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm tracking-wide">Tableau de Bord</span>
             </button>
-            <button onclick="window.location.href='live.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+            <button onclick="window.location.href='/live'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-chart-line text-lg"></i> <span class="font-bold text-sm tracking-wide">Marché Live</span>
             </button>
             <button class="w-full flex items-center gap-4 p-3.5 rounded-xl nav-active text-white">
                 <i class="fa-solid fa-user-plus text-lg text-indigo-400"></i> <span class="font-bold text-sm tracking-wide">Créer un Accès</span>
             </button>
             <div class="h-px bg-white/[0.03] my-6 mx-4"></div>
-            <button onclick="window.location.href='login.html'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+            <button onclick="window.location.href='/login'" class="w-full flex items-center gap-4 p-3.5 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
                 <i class="fa-solid fa-fingerprint text-lg"></i> <span class="font-bold text-sm tracking-wide">S'identifier</span>
             </button>
         </nav>
-
-        <div class="p-6 border-t border-white/[0.03]">
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-600/5 border border-indigo-500/10">
-                <i class="fa-solid fa-shield-halved text-indigo-500"></i>
-                <p class="text-[9px] font-black text-white uppercase italic tracking-wider">Level 4 Security</p>
-            </div>
-        </div>
     </aside>
 
     <main class="main-container">
@@ -185,9 +169,6 @@
                             <p class="text-indigo-500 font-black uppercase tracking-[0.3em] text-[10px] mb-2">Protocol de vérification</p>
                             <h2 class="text-3xl lg:text-5xl font-[1000] uppercase tracking-tighter italic text-white leading-none">Identity <span class="text-indigo-500">Audit</span></h2>
                         </div>
-                        <div class="hidden md:flex w-16 h-16 bg-white/5 rounded-2xl items-center justify-center">
-                            <i class="fa-solid fa-shield-halved text-3xl text-indigo-500/30"></i>
-                        </div>
                     </div>
 
                     <form id="audit-form" class="space-y-8">
@@ -198,17 +179,16 @@
                                     <input type="text" id="reg-nom" placeholder="NOM" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold uppercase tracking-widest outline-none">
                                     <input type="text" id="reg-prenom" placeholder="PRÉNOM" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-bold outline-none">
                                 </div>
-                                <div class="relative">
-                                    <input type="date" id="reg-date" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono uppercase outline-none">
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-slate-500 font-black pointer-events-none uppercase bg-black px-2">Date de Naissance</span>
-                                </div>
                             </div>
                             
                             <div class="space-y-5">
-                                <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">02. Communication</h3>
+                                <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3">02. Sécurité & Contact</h3>
                                 <div class="space-y-4">
                                     <input type="email" id="reg-email" placeholder="EMAIL DE RÉCUPÉRATION" required class="w-full p-4 lg:p-5 rounded-xl text-sm outline-none">
-                                    <input type="tel" id="reg-tel" placeholder="+33 _ __ __ __ __" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono outline-none">
+                                    <div class="relative">
+                                        <input type="password" id="reg-key" placeholder="DÉFINIR CLÉ CRYPTER" required class="w-full p-4 lg:p-5 rounded-xl text-sm font-mono tracking-widest outline-none border-indigo-500/30">
+                                        <i class="fa-solid fa-lock absolute right-5 top-1/2 -translate-y-1/2 text-indigo-500/50"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -216,139 +196,110 @@
                         <div class="pt-8 border-t border-white/5">
                             <h3 class="text-[10px] font-black text-indigo-400 uppercase border-l-2 border-indigo-500 pl-3 mb-6">03. Documents Requis</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                                
-                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
-                                    <i class="fa-solid fa-id-card text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">ID Card / Passport</p>
-                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
-                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
-                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
-                                    </div>
-                                </div>
-                                
-                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
-                                    <i class="fa-solid fa-face-viewfinder text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">Scan Facial Live</p>
-                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
-                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
-                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
-                                    </div>
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 relative overflow-hidden transition-all cursor-pointer">
+                                    <i class="fa-solid fa-id-card text-2xl text-slate-700 group-hover:text-indigo-400"></i>
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase text-center px-2">ID Card / Passport</p>
+                                    <input type="file" class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center"><i class="fa-solid fa-check text-emerald-500 text-2xl"></i></div>
                                 </div>
 
-                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 transition-all cursor-pointer relative overflow-hidden">
-                                    <i class="fa-solid fa-file-invoice text-2xl text-slate-700 group-hover:text-indigo-400 transition-colors"></i>
-                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase tracking-tighter text-center px-2">Proof of Address</p>
-                                    <input type="file" required class="file-input absolute inset-0 opacity-0 cursor-pointer">
-                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center">
-                                        <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
-                                    </div>
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 relative overflow-hidden transition-all cursor-pointer">
+                                    <i class="fa-solid fa-face-viewfinder text-2xl text-slate-700 group-hover:text-indigo-400"></i>
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase text-center px-2">Scan Facial Live</p>
+                                    <input type="file" class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center"><i class="fa-solid fa-check text-emerald-500 text-2xl"></i></div>
                                 </div>
 
+                                <div class="file-card h-32 lg:h-40 bg-black/40 rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center group hover:border-indigo-500/40 relative overflow-hidden transition-all cursor-pointer">
+                                    <i class="fa-solid fa-file-invoice text-2xl text-slate-700 group-hover:text-indigo-400"></i>
+                                    <p class="file-label text-[8px] font-black mt-3 text-slate-500 uppercase text-center px-2">Proof of Address</p>
+                                    <input type="file" class="file-input absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="file-preview absolute inset-0 bg-emerald-500/10 hidden items-center justify-center"><i class="fa-solid fa-check text-emerald-500 text-2xl"></i></div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="pt-6">
-                            <button type="button" id="submit-audit" onclick="executeAuditSubmission()" class="w-full py-5 lg:py-8 bg-white text-black font-[1000] uppercase text-[10px] lg:text-xs tracking-[0.4em] rounded-2xl lg:rounded-3xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-3">
+                            <button type="button" id="submit-audit" onclick="executeAuditSubmission()" class="w-full py-5 lg:py-8 bg-white text-black font-[1000] uppercase text-[10px] tracking-[0.4em] rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-3">
                                 <i class="fa-solid fa-bolt"></i> Synchroniser Profil Quantum
                             </button>
-                            <p id="error-msg" class="text-center text-red-500 text-[10px] font-bold uppercase mt-4 hidden">Veuillez compléter tous les protocoles.</p>
                         </div>
                     </form>
                 </div>
             </div>
-
-            <div class="mt-12 text-center opacity-30">
-                <i class="fa-solid fa-fingerprint text-3xl mb-4"></i>
-                <p class="text-[8px] font-black uppercase tracking-widest leading-relaxed">
-                    Données chiffrées AES-256 • Iryon Security Stack v4.2.1
-                </p>
-            </div>
         </div>
     </main>
 
+    <div id="success-modal" class="fixed inset-0 z-[3000] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="quantum-card max-w-md w-full rounded-[2rem] p-8 border border-emerald-500/30 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 shadow-[0_0_15px_#10b981]"></div>
+            <div class="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
+                <i class="fa-solid fa-shield-check text-4xl text-emerald-500"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white uppercase italic mb-2">Accès Synchronisé</h2>
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-8 leading-relaxed">Votre identité est sécurisée. <br>Utilisez votre Pseudo et votre Clé pour vous connecter.</p>
+            
+            <div class="space-y-4 mb-8 text-left">
+                <div class="bg-black/50 p-4 rounded-xl border border-white/5">
+                    <p class="text-[9px] text-slate-500 font-black uppercase mb-1">Votre Pseudo Généré</p>
+                    <p id="display-username" class="text-lg font-mono text-white font-bold">---</p>
+                </div>
+            </div>
+            <button onclick="window.location.href='/login'" class="w-full py-4 bg-emerald-500 text-black font-black uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-emerald-400 transition-all">Accéder au Terminal</button>
+        </div>
+    </div>
+
     <script>
-        // --- GESTION DES FICHIERS ---
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menu-overlay').classList.toggle('active');
+        }
+
         document.querySelectorAll('.file-input').forEach(input => {
             input.addEventListener('change', function() {
                 const card = this.closest('.file-card');
                 const label = card.querySelector('.file-label');
                 const preview = card.querySelector('.file-preview');
-                
-                if (this.files && this.files[0]) {
-                    // Masquer l'icône et le texte, afficher le check vert
-                    card.classList.remove('border-white/5');
-                    card.classList.add('border-emerald-500/50');
+                if (this.files[0]) {
                     preview.style.display = 'flex';
-                    label.innerText = "CHARGÉ : " + this.files[0].name.substring(0, 10) + "...";
-                    label.classList.add('text-emerald-400');
-                    label.classList.remove('text-slate-500');
+                    label.innerText = "CHARGÉ : " + this.files[0].name.substring(0, 8) + "..";
+                    label.classList.replace('text-slate-500', 'text-emerald-400');
                 }
             });
         });
 
-        // --- SUBMISSION LOGIC ---
         async function executeAuditSubmission() {
             const btn = document.getElementById('submit-audit');
-            const form = document.getElementById('audit-form');
-            const errorMsg = document.getElementById('error-msg');
-            const inputs = form.querySelectorAll('input[required]');
-            
-            // 1. Validation de base
-            let isValid = true;
-            inputs.forEach(input => {
-                if(!input.value) {
-                    input.classList.add('border-red-500/50');
-                    isValid = false;
-                } else {
-                    input.classList.remove('border-red-500/50');
-                }
-            });
+            const data = {
+                nom: document.getElementById('reg-nom').value,
+                prenom: document.getElementById('reg-prenom').value,
+                email: document.getElementById('reg-email').value,
+                securityKey: document.getElementById('reg-key').value // On envoie TA clé
+            };
 
-            if(!isValid) {
-                errorMsg.classList.remove('hidden');
+            if (!data.nom || !data.prenom || !data.email || !data.securityKey) {
+                alert("Veuillez remplir tous les champs, y compris votre Clé Crypter.");
                 return;
             }
-            errorMsg.classList.add('hidden');
 
-            // 2. Effet visuel "Hacker"
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> CRYPTAGE DU PROFIL...';
+            try {
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Audit en cours...';
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
 
-            // 3. Simulation de traitement Iryon
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-shield-check fa-beat mr-2"></i> VÉRIFICATION RÉSEAU...';
-                
-                setTimeout(() => {
-                    // Transition vers succès
-                    btn.classList.replace('bg-white', 'bg-emerald-500');
-                    btn.classList.replace('text-black', 'text-white');
-                    btn.innerHTML = '<i class="fa-solid fa-check-double"></i> ACCÈS AUTORISÉ';
-                    
-                    const container = document.getElementById('quantum-form-container');
-                    container.classList.add('success-mode');
-
-                    // 4. Redirection
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 1500);
-                }, 2000);
-            }, 1500);
-        }
-
-        // --- SIDEBAR ---
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('menu-overlay');
-            const icon = document.getElementById('menu-icon');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            
-            if(sidebar.classList.contains('open')) {
-                icon.classList.replace('fa-bars-staggered', 'fa-xmark');
-            } else {
-                icon.classList.replace('fa-xmark', 'fa-bars-staggered');
+                if (result.success) {
+                    document.getElementById('display-username').innerText = result.username;
+                    document.getElementById('success-modal').style.display = 'flex';
+                } else {
+                    alert("Erreur: " + result.message);
+                    btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Synchroniser Profil Quantum';
+                }
+            } catch (e) {
+                alert("Erreur de connexion au serveur.");
             }
         }
     </script>
