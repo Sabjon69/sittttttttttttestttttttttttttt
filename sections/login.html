@@ -11,10 +11,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
 
-        :root {
-            --primary: #6366f1;
-            --bg: #020202;
-        }
+        :root { --primary: #6366f1; --bg: #020202; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -22,7 +19,6 @@
             margin: 0;
             color: #e2e8f0;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .bg-grid {
@@ -32,32 +28,24 @@
             z-index: -1;
         }
 
-        /* --- NAVIGATION SIDEBAR --- */
         .sidebar-fixed {
-            width: 300px;
-            height: 100vh;
-            background: #050505;
+            width: 300px; height: 100vh; background: #050505;
             border-right: 1px solid rgba(255, 255, 255, 0.03);
             position: fixed; left: 0; top: 0;
-            display: flex; flex-direction: column;
-            z-index: 2000;
+            display: flex; flex-direction: column; z-index: 2000;
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .main-container {
-            margin-left: 300px;
-            min-height: 100vh;
-            transition: all 0.4s;
+            margin-left: 300px; min-height: 100vh;
             width: calc(100% - 300px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
         @media (max-width: 1024px) {
             .sidebar-fixed { transform: translateX(-100%); width: 280px; }
-            .sidebar-fixed.open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.9); }
-            .main-container { margin-left: 0; width: 100%; padding-top: 80px; }
+            .sidebar-fixed.open { transform: translateX(0); }
+            .main-container { margin-left: 0; width: 100%; }
         }
 
         .nav-active { 
@@ -66,7 +54,6 @@
             color: white !important; 
         }
 
-        /* --- EFFETS VISUELS --- */
         .glass-panel {
             background: rgba(13, 17, 23, 0.7);
             backdrop-filter: blur(25px);
@@ -76,16 +63,13 @@
         .scanline {
             width: 100%; height: 2px; z-index: 5;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            position: absolute;
-            animation: scanline 4s linear infinite;
-            opacity: 0.3;
+            position: absolute; animation: scanline 4s linear infinite; opacity: 0.3;
         }
         @keyframes scanline { 0% { top: 0%; } 100% { top: 100%; } }
 
         .shake { animation: shake 0.4s both; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
@@ -93,53 +77,31 @@
         input {
             background: rgba(0, 0, 0, 0.6) !important;
             border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            transition: all 0.3s ease !important;
             color: white !important;
         }
-        input:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-            outline: none;
-        }
-
-        #menu-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1500;
-        }
-        #menu-overlay.active { display: block; }
+        input:focus { border-color: var(--primary) !important; outline: none; }
     </style>
 </head>
 <body class="antialiased">
 
-    <div id="menu-overlay" onclick="toggleSidebar()"></div>
     <div class="bg-grid"></div>
-
-    <header class="lg:hidden fixed top-0 left-0 w-full flex items-center justify-between px-5 py-4 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 z-[1100]">
-        <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center">
-                <img src="/assets/logo.png" alt="Logo" class="w-8 h-8 object-contain">
-            </div>
-            <h1 class="font-black uppercase tracking-tighter text-white italic text-xl">IRYON</h1>
-        </div>
-        <button onclick="toggleSidebar()" class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white">
-            <i class="fa-solid fa-bars-staggered" id="menu-icon"></i>
-        </button>
-    </header>
 
     <aside id="sidebar" class="sidebar-fixed">
         <div class="p-8 border-b border-white/[0.03] flex items-center gap-4">
-            <img src="/assets/logo.png" alt="Logo" class="w-12 h-12 object-contain">
+            <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-atom text-indigo-500 text-xl"></i>
+            </div>
             <h1 class="text-2xl font-black text-white uppercase tracking-tighter italic">IRYON</h1>
         </div>
         
         <nav class="flex-1 px-4 py-8 space-y-1">
-            <button onclick="window.location.href='/home'" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+            <button onclick="window.location.href='/'" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:bg-white/5 transition-all text-left">
                 <i class="fa-solid fa-house text-lg"></i> <span class="font-bold text-sm">Accueil</span>
             </button>
-            <button onclick="window.location.href='/register'" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:bg-white/5 transition-all">
+            <button onclick="window.location.href='/register'" class="w-full flex items-center gap-4 p-4 rounded-xl text-slate-500 hover:bg-white/5 transition-all text-left">
                 <i class="fa-solid fa-user-plus text-lg"></i> <span class="font-bold text-sm">Créer un Accès</span>
             </button>
-            <button class="w-full flex items-center gap-4 p-4 rounded-xl nav-active text-white">
+            <button class="w-full flex items-center gap-4 p-4 rounded-xl nav-active text-white text-left">
                 <i class="fa-solid fa-fingerprint text-lg text-indigo-400"></i> <span class="font-bold text-sm">S'identifier</span>
             </button>
         </nav>
@@ -160,77 +122,67 @@
                 <div class="scanline"></div>
                 
                 <div class="text-center mb-10 relative z-10">
-                    <div class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-indigo-500/20 shadow-2xl">
+                    <div class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-indigo-500/20">
                         <i class="fa-solid fa-shield-halved text-3xl text-indigo-500"></i>
                     </div>
                     <h2 class="text-3xl font-[1000] text-white uppercase italic tracking-tighter leading-none">Accès <span class="text-indigo-500">Core</span></h2>
                     <p class="text-slate-600 text-[8px] font-black uppercase tracking-[0.4em] mt-3">Quantum Auth v2.0</p>
                 </div>
 
-                <div class="space-y-6 relative z-10">
+                <form onsubmit="event.preventDefault(); executeLogin();" class="space-y-6 relative z-10">
                     <div class="group">
-                        <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2 italic">Terminal ID (Email ou Pseudo)</label>
+                        <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2 italic">Terminal ID</label>
                         <div class="relative">
-                            <i class="fa-solid fa-at absolute left-5 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="text" id="login-user" 
-                                class="w-full py-4 pl-12 pr-6 rounded-xl text-sm font-bold placeholder:text-slate-800" 
-                                placeholder="Saisir identifiant...">
+                            <i class="fa-solid fa-at absolute left-5 top-1/2 -translate-y-1/2 text-slate-700 transition-colors"></i>
+                            <input type="text" id="login-user" class="w-full py-4 pl-12 pr-6 rounded-xl text-sm font-bold" placeholder="Identifiant..." required>
                         </div>
                     </div>
 
                     <div class="group">
-                        <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2 italic">Clé Crypter (Mot de Passe)</label>
+                        <label class="block text-[9px] text-slate-500 font-black uppercase tracking-widest mb-2 ml-2 italic">Clé Crypter</label>
                         <div class="relative">
-                            <i class="fa-solid fa-key absolute left-5 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="password" id="login-pass" 
-                                class="w-full py-4 pl-12 pr-6 rounded-xl text-sm font-bold placeholder:text-slate-800" 
-                                placeholder="••••••••">
+                            <i class="fa-solid fa-key absolute left-5 top-1/2 -translate-y-1/2 text-slate-700 transition-colors"></i>
+                            <input type="password" id="login-pass" class="w-full py-4 pl-12 pr-6 rounded-xl text-sm font-bold" placeholder="••••••••" required>
                         </div>
                     </div>
                     
                     <div class="pt-4">
-                        <button onclick="executeLogin()" id="btn-login" class="w-full h-16 rounded-2xl bg-white text-black font-black uppercase text-[10px] tracking-[0.4em] transition-all hover:bg-indigo-600 hover:text-white active:scale-95 shadow-xl flex items-center justify-center">
+                        <button type="submit" id="btn-login" class="w-full h-16 rounded-2xl bg-white text-black font-black uppercase text-[10px] tracking-[0.4em] transition-all hover:bg-indigo-600 hover:text-white shadow-xl flex items-center justify-center">
                             <span id="btn-text">Initialiser Liaison</span>
                         </button>
                     </div>
 
                     <div class="text-center pt-2">
-                        <button onclick="window.location.href='/register'" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-all">
+                        <button type="button" onclick="window.location.href='/register'" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-all">
                             Pas de profil ? <span class="text-indigo-500">Créer un accès</span>
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </main>
 
     <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('menu-overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
+        // SCRIPT CORRIGÉ : Plus de boucle infinie au chargement de la page
 
         async function executeLogin() {
-            const username = document.getElementById('login-user').value;
-            const securityKey = document.getElementById('login-pass').value;
+            const username = document.getElementById('login-user').value.trim();
+            const securityKey = document.getElementById('login-pass').value.trim();
             const btn = document.getElementById('btn-login');
             const btnText = document.getElementById('btn-text');
             const errorBox = document.getElementById('error-box');
             const card = document.getElementById('login-card');
 
-            if (!username || !securityKey) {
-                showError("Veuillez remplir les champs.");
-                return;
-            }
+            if (!username || !securityKey) return;
 
+            // Interface Loading
             errorBox.classList.add('hidden');
             card.classList.remove('shake');
             btn.disabled = true;
-            btnText.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-3"></i> SYNC...';
+            btnText.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> SYNC...';
 
             try {
+                // Envoi des données au serveur Node.js
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -240,29 +192,27 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    btnText.innerHTML = 'LIAISON ÉTABLIE';
+                    // Sauvegarde du pseudo pour le design du dashboard (optionnel)
+                    localStorage.setItem('user_name', username);
+                    
+                    // Succès Visuel (Bouton Vert)
+                    btnText.innerHTML = 'ACCÈS ACCORDÉ';
                     btn.classList.replace('bg-white', 'bg-emerald-500');
                     btn.classList.add('text-white');
-                    
-                    // --- CORRECTION : Sauvegarde dans le LocalStorage ---
-                    localStorage.setItem('user_name', result.user.username);
-                    localStorage.setItem('user_balance', result.user.balance);
 
+                    // Redirection vers le dashboard après 800ms
                     setTimeout(() => {
-                        // Redirection selon le pseudo
-                        if (result.user.username === 'admin') {
-                            window.location.href = "/admin-dashboard";
-                        } else {
-                            window.location.href = "/client-dashboard";
-                        }
-                    }, 1000);
+                        window.location.href = "/client-dashboard";
+                    }, 800);
                 } else {
                     showError(result.message || "Identifiants invalides.");
                 }
             } catch (err) {
-                showError("Erreur de connexion serveur.");
+                console.error("Erreur Fetch :", err);
+                showError("Erreur critique de liaison serveur.");
             } finally {
-                if (!btn.classList.contains('bg-emerald-500')) {
+                // Remet le bouton à zéro seulement en cas d'erreur
+                if (btnText.innerHTML !== 'ACCÈS ACCORDÉ') {
                     btn.disabled = false;
                     btnText.innerHTML = "Initialiser Liaison";
                 }
@@ -276,7 +226,6 @@
             errorMsg.innerText = msg;
             errorBox.classList.remove('hidden');
             card.classList.add('shake');
-            setTimeout(() => card.classList.remove('shake'), 500);
         }
     </script>
 </body>

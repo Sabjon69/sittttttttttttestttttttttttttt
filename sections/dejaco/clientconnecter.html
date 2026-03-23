@@ -2,169 +2,241 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IRYON | Dashboard Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IRON ENCHÈRES | Terminal Client</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        :root { --primary: #6366f1; --bg: #020202; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
-
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .sidebar { width: 280px; height: 100vh; position: fixed; left: 0; top: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 50; }
-        .main-content { margin-left: 280px; padding: 40px; }
-        
-        .card-stat { 
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
+        :root { 
+            --primary: #6366f1; 
+            --bg: #020202; 
         }
-        .card-stat:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1); }
 
-        .status-pulse {
-            width: 8px; height: 8px; background: #10b981; border-radius: 50%;
-            box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite;
+        body { 
+            background-color: var(--bg); 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden; 
         }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        .nav-link { transition: all 0.3s ease; color: #64748b; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; }
-        .nav-active { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+        /* Scrollbar Custom */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 10px; }
+
+        .glass { 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+        }
         
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 10px; }
+        .sidebar { 
+            width: 280px; height: 100vh; position: fixed; left: 0; top: 0; 
+            background: #050505; border-right: 1px solid rgba(255,255,255,0.05); z-index: 50; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .main-content { 
+            margin-left: 280px; height: 100vh; overflow-y: auto; 
+            padding: 40px; box-sizing: border-box; transition: 0.4s ease;
+        }
+
+        /* --- CORRECTIF ZONE 1013px - 1225px --- */
+        @media (min-width: 1013px) and (max-width: 1225px) {
+            .sidebar { width: 230px; }
+            .main-content { margin-left: 230px; padding: 25px; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            .terminal-header-text { font-size: 2.5rem !important; }
+        }
+
+        @media (max-width: 1012px) {
+            .sidebar { transform: translateX(-100%); width: 300px; }
+            .sidebar.open { transform: translateX(0); box-shadow: 50px 0 100px rgba(0,0,0,0.9); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 100px; }
+            .stat-grid { grid-template-columns: 1fr !important; }
+            .terminal-header-text { font-size: 2.2rem !important; }
+        }
+
+        .nav-link { transition: all 0.3s ease; color: #64748b; border-radius: 1.2rem; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.03); color: white; transform: translateX(5px); }
+        .nav-active { 
+            background: rgba(99, 102, 241, 0.08); 
+            border: 1px solid rgba(99, 102, 241, 0.2); 
+            color: white !important; 
+        }
+
+        #menu-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(10px); z-index: 45;
+        }
+        #menu-overlay.active { display: block; }
+
+        .stat-card { transition: all 0.4s ease; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); background: rgba(99, 102, 241, 0.03); }
+
+        #feed { font-family: 'JetBrains Mono', monospace; }
+        
+        .log-entry { animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
-<body>
+<body class="antialiased">
 
-    <aside class="sidebar glass p-8 flex flex-col">
-        <div class="flex items-center gap-4 mb-12">
-            <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 object-contain">
-            <h1 class="text-xl font-black italic tracking-tighter uppercase">Iryon <span class="text-indigo-500">Pro</span></h1>
+    <div id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header class="lg:hidden fixed top-0 w-full p-6 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 z-[60] flex justify-between items-center">
+        <div class="flex flex-col">
+            <span class="font-black italic text-xl text-white">IRON</span>
+            <span class="font-bold text-indigo-500 text-[9px] tracking-widest">ENCHÈRES</span>
+        </div>
+        <button onclick="toggleMenu()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 text-white">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </header>
+
+    <aside id="sidebar" class="sidebar flex flex-col">
+        <div class="p-6 lg:p-8 border-b border-white/[0.03] relative overflow-hidden flex items-center">
+            <div class="absolute -left-5 -top-5 w-24 h-24 bg-indigo-600/10 blur-[40px] rounded-full"></div>
+            <div class="flex items-center gap-4 group cursor-pointer relative z-10" onclick="window.location.href='/client-dashboard'">
+                <div class="w-12 h-12 lg:w-14 lg:h-14 bg-white/[0.02] border border-white/10 rounded-xl flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="/sections/assets/logo.png" alt="Logo" class="w-full h-full object-contain transform scale-125 transition-transform duration-700 group-hover:scale-150">
+                </div>
+                <div>
+                    <h1 class="text-xl lg:text-2xl font-black text-white uppercase tracking-tighter leading-none italic">IRON<br><span class="text-indigo-500 not-italic">ENCHÈRES</span></h1>
+                    <p class="text-[8px] text-slate-500 font-black tracking-[0.3em] uppercase italic mt-2">v2.0 Stable</p>
+                </div>
+            </div>
         </div>
 
-        <nav class="flex-1 space-y-3">
-            <a href="/client-dashboard" class="nav-link nav-active flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+        <nav class="flex-1 p-6 space-y-2">
+            <a href="/client-dashboard" class="nav-link nav-active flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-chart-pie text-indigo-500"></i> Dashboard
             </a>
-            <a href="/marcher-actuel" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+            <a href="/marcher-actuel" class="nav-link flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-shop"></i> Marché Actuel
             </a>
-            <a href="/inventaire" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+            <a href="/inventaire" class="nav-link flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-vault"></i> Mon Inventaire
             </a>
-            <a href="/mes-encheres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+            <a href="/mes-encheres" class="nav-link flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-gavel"></i> Mes Enchères
             </a>
-            <a href="/portefeuille" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+            <a href="/portefeuille" class="nav-link flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-wallet"></i> Portefeuille
             </a>
-            <a href="/parametres" class="nav-link flex items-center gap-4 p-4 rounded-2xl font-bold text-sm">
+            <a href="/parametres" class="nav-link flex items-center gap-4 p-4 font-bold text-sm">
                 <i class="fa-solid fa-gear"></i> Paramètres
             </a>
         </nav>
 
-        <button onclick="logout()" class="mt-auto flex items-center gap-4 p-4 text-red-500/60 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-all">
-            <i class="fa-solid fa-power-off"></i> Déconnexion
-        </button>
+        <div class="p-6 mt-auto border-t border-white/5">
+            <button onclick="logout()" class="w-full flex items-center gap-4 p-4 text-red-500/50 hover:text-red-500 transition-colors font-black text-[10px] uppercase tracking-[0.2em]">
+                <i class="fa-solid fa-power-off text-sm"></i> Déconnexion Sécurisée
+            </button>
+        </div>
     </aside>
 
     <main class="main-content">
-        <header class="flex justify-between items-center mb-12">
-            <div>
-                <h2 class="text-3xl font-[1000] italic uppercase tracking-tighter">Terminal <span class="text-indigo-500">Client</span></h2>
-                <div class="flex items-center gap-2 mt-1">
-                    <div class="status-pulse"></div>
-                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Liaison Quantum Établie</span>
-                </div>
-            </div>
+        <div class="max-w-6xl mx-auto">
             
-            <div class="flex items-center gap-6">
-                <div class="text-right">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Utilisateur Actif</p>
-                    <p class="font-bold text-white italic text-lg" id="display-username">SYNCHRONISATION...</p>
+            <div class="mb-12">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    <p class="text-indigo-500 text-[10px] font-black uppercase tracking-[0.3em] italic">Handshake Iron-Net v2.0 OK</p>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-                    <i class="fa-solid fa-user-ninja text-indigo-500 text-xl"></i>
-                </div>
+                <h2 class="terminal-header-text text-3xl lg:text-5xl font-[1000] italic uppercase tracking-tighter leading-none text-white">
+                    Terminal <br><span class="text-indigo-500 break-all" id="user-name">...</span>
+                </h2>
             </div>
-        </header>
 
-        <div class="grid grid-cols-3 gap-6 mb-12">
-            <div class="card-stat p-8 rounded-[2rem]">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Solde Disponible</p>
-                <h3 class="text-4xl font-black text-white italic"><span id="display-balance">0</span> <span class="text-indigo-500 text-lg">€</span></h3>
-            </div>
-            <div class="card-stat p-8 rounded-[2rem]">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Items Possédés</p>
-                <h3 class="text-4xl font-black text-white italic"><span id="count-inventory">0</span> <span class="text-indigo-500 text-lg">Items</span></h3>
-            </div>
-            <div class="card-stat p-8 rounded-[2rem]">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Rang de Crédit</p>
-                <h3 class="text-4xl font-black text-emerald-400 italic font-mono">AAA+</h3>
-            </div>
-        </div>
-
-        <div class="mb-6 flex justify-between items-end">
-            <h3 class="text-xl font-black uppercase tracking-tight italic text-white/80">Aperçu <span class="text-indigo-500">Live</span></h3>
-            <button onclick="window.location.href='/marcher-actuel'" class="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:underline">Accéder au marché complet</button>
-        </div>
-
-        <div class="grid grid-cols-4 gap-6">
-            <div class="glass p-5 rounded-[2.5rem] group cursor-pointer hover:border-indigo-500/30 transition-all">
-                <div class="relative h-44 rounded-[1.5rem] bg-black/40 mb-4 overflow-hidden border border-white/5">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-800 text-4xl group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-microchip"></i>
+            <div class="stat-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="stat-card glass p-8 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Balance Actuelle</p>
+                    <div class="text-4xl lg:text-5xl font-black italic text-white">
+                        <span id="user-balance">0</span> <span class="text-indigo-500 text-2xl font-bold">€</span>
                     </div>
-                    <div class="absolute top-3 right-3 px-3 py-1 bg-indigo-500 text-[9px] font-black rounded-lg uppercase italic tracking-widest">04:12:05</div>
                 </div>
-                <h4 class="font-bold text-[10px] text-slate-500 uppercase tracking-widest mb-1">Hardware</h4>
-                <p class="text-white font-black text-lg italic mb-4">Module Quantum V8</p>
-                <button onclick="window.location.href='/marcher-actuel'" class="w-full py-4 rounded-xl bg-white text-black hover:bg-indigo-600 hover:text-white text-[9px] font-[1000] uppercase tracking-[0.2em] transition-all">Détails</button>
+                
+                <div class="stat-card glass p-8 rounded-[2.5rem]">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Unités en Vault</p>
+                    <div class="text-4xl lg:text-5xl font-black italic text-white">
+                        <span id="inventory-count">0</span> <span class="text-indigo-500 text-2xl uppercase">ut</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card glass p-8 rounded-[2.5rem] border-l-4 border-indigo-500 bg-indigo-500/5">
+                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 italic">Niveau d'Accès</p>
+                    <div class="text-4xl lg:text-5xl font-black italic text-indigo-500 tracking-tighter uppercase">Elite</div>
+                </div>
             </div>
 
-            <div class="glass p-5 rounded-[2.5rem] group cursor-pointer hover:border-red-500/30 transition-all">
-                <div class="relative h-44 rounded-[1.5rem] bg-black/40 mb-4 overflow-hidden border border-white/5">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-800 text-4xl group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-car-side"></i>
-                    </div>
-                    <div class="absolute top-3 right-3 px-3 py-1 bg-red-600 text-[9px] font-black rounded-lg uppercase italic tracking-widest animate-pulse">00:15:30</div>
+            <div class="glass p-8 lg:p-12 rounded-[3rem] border-white/10">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="font-black uppercase italic text-white tracking-tighter text-2xl">Flux Temps Réel</h3>
+                    <div class="h-[1px] flex-1 bg-white/5 mx-8 hidden sm:block"></div>
+                    <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest px-4 py-2 bg-indigo-500/10 rounded-full">Live Monitor</span>
                 </div>
-                <h4 class="font-bold text-[10px] text-slate-500 uppercase tracking-widest mb-1">Véhicule</h4>
-                <p class="text-white font-black text-lg italic mb-4">Hyperion GT-X</p>
-                <button onclick="window.location.href='/marcher-actuel'" class="w-full py-4 rounded-xl bg-indigo-600 text-white text-[9px] font-[1000] uppercase tracking-[0.2em] transition-all">Enchérir</button>
+                
+                <div id="feed" class="space-y-4 text-[11px] text-slate-400 max-h-[300px] overflow-y-auto pr-4">
+                    <div class="log-entry flex items-center gap-4">
+                        <span class="text-emerald-500 font-bold">[OK]</span>
+                        <p>> Handshake protocole IRON-NET v2.0 terminé.</p>
+                    </div>
+                </div>
             </div>
+
         </div>
     </main>
 
     <script>
-        window.onload = () => {
-            const userName = localStorage.getItem('user_name');
-            const userBalance = localStorage.getItem('user_balance');
-            const inventory = JSON.parse(localStorage.getItem('user_inventory')) || [];
+        document.addEventListener('DOMContentLoaded', () => {
+            const nom = localStorage.getItem('user_name') || "CHARLE333@GMAIL.COM";
+            const solde = localStorage.getItem('user_balance') || "0";
+            const inventory = JSON.parse(localStorage.getItem('user_inventory') || "[]");
 
-            // Affichage Pseudo
-            if (userName) {
-                document.getElementById('display-username').innerText = userName.toUpperCase();
-            } else {
-                window.location.href = "/login";
-            }
+            document.getElementById('user-name').innerText = nom.toUpperCase();
+            document.getElementById('user-balance').innerText = parseFloat(solde).toLocaleString('fr-FR');
+            document.getElementById('inventory-count').innerText = inventory.length;
 
-            // Affichage Solde
-            if (userBalance) {
-                document.getElementById('display-balance').innerText = parseFloat(userBalance).toLocaleString('fr-FR');
-            }
+            const feed = document.getElementById('feed');
+            const messages = [
+                "Synchronisation cryptographique du portefeuille...",
+                "Scan des actifs de luxe en cours...",
+                "Liaison établie avec le nœud IRON-CORE #77.",
+                "Vérification de l'intégrité de la base de données...",
+                "Flux de données entrant sécurisé via SSL-256."
+            ];
 
-            // Affichage Nombre items inventaire
-            document.getElementById('count-inventory').innerText = inventory.length;
-        };
+            setInterval(() => {
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                const div = document.createElement('div');
+                div.className = "log-entry flex items-center gap-4 opacity-100";
+                div.innerHTML = `<span class="text-indigo-500 font-bold">[INFO]</span> <p>> ${msg}</p>`;
+                feed.appendChild(div);
+                if(feed.children.length > 8) feed.removeChild(feed.children[0]);
+                feed.scrollTop = feed.scrollHeight;
+            }, 4000);
+        });
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menu-overlay').classList.toggle('active');
+        }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = "/login";
+            if(confirm("Confirmer la déconnexion du terminal IRON ?")) {
+                localStorage.clear();
+                window.location.href = "/api/logout";
+            }
         }
     </script>
 </body>

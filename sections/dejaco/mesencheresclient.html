@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IRON | Tactical Monitoring Terminal v2.0.6</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;1000&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root { 
+            --primary: #6366f1; 
+            --bg: #020202; 
+            --accent: #818cf8; 
+            --sidebar-width: 280px;
+            --mobile-header-height: 80px;
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            height: 100vh; 
+            overflow: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- ÉLÉMENTS DE DESIGN --- */
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-heavy { background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 10px; }
+
+        /* --- HEADER MOBILE (VISIBLE UNIQUEMENT SUR MOBILE/TABLETTE) --- */
+        .mobile-top-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--mobile-header-height);
+            z-index: 100;
+            padding: 0 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            height: 100vh; 
+            position: fixed; 
+            left: 0; top: 0; 
+            background: #050505; 
+            border-right: 1px solid rgba(255,255,255,0.05); 
+            z-index: 110; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .main-content { 
+            margin-left: var(--sidebar-width); 
+            height: 100vh; 
+            overflow-y: auto; 
+            padding: 40px; 
+            box-sizing: border-box; 
+            transition: all 0.4s ease;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-link { transition: all 0.3s ease; color: #64748b; border-radius: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; font-weight: 700; text-decoration: none; font-size: 0.875rem; cursor: pointer; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.03); color: white; transform: translateX(5px); }
+        .nav-active { background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); color: white !important; }
+
+        /* --- SYSTÈME DE SECTIONS --- */
+        .page-section { display: none; animation: slideUp 0.5s ease-out forwards; }
+        .page-section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CARDS TACTIQUES --- */
+        .bid-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+        .bid-card:hover:not(.active) { border-color: var(--primary); background: rgba(255,255,255,0.02); transform: translateY(-5px); cursor: pointer; }
+        .bid-card.active { border-color: var(--primary); background: rgba(99, 102, 241, 0.04); cursor: default; }
+        
+        .details-pane { max-height: 0; opacity: 0; transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; overflow: hidden; }
+        .bid-card.active .details-pane { max-height: 3000px; opacity: 1; pointer-events: auto; padding-top: 30px; }
+
+        .close-btn { 
+            position: absolute; top: 20px; left: 20px; width: 38px; height: 38px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; color: #64748b; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transform: scale(0.5); transition: 0.3s; z-index: 50;
+        }
+        .bid-card.active .close-btn { opacity: 1; transform: scale(1); }
+
+        .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- NOTIFICATIONS --- */
+        #notification-toast {
+            position: fixed; bottom: 30px; right: 30px; transform: translateX(150%);
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 200;
+        }
+        #notification-toast.show { transform: translateX(0); }
+
+        /* ==========================================
+           RESPONSIVITÉ AVANCÉE
+           ========================================== */
+        @media (max-width: 1024px) {
+            .mobile-top-bar { display: flex; }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); box-shadow: 25px 0 50px rgba(0,0,0,0.9); }
+            
+            .main-content { margin-left: 0; padding: 20px; padding-top: calc(var(--mobile-header-height) + 20px); }
+            
+            .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 105; }
+            .mobile-overlay.open { display: block; }
+            
+            #notification-toast { left: 20px; right: 20px; bottom: 20px; width: auto; transform: translateY(250%); }
+            #notification-toast.show { transform: translateY(0); }
+            
+            .bid-card { padding: 1.5rem !important; border-radius: 2rem !important; }
+            h2 { font-size: 2.8rem !important; }
+        }
+
+        @media (max-width: 640px) {
+            h2 { font-size: 2.2rem !important; }
+            .card-header-main { flex-direction: column; align-items: flex-start !important; }
+            .stats-grid { grid-template-cols: 1fr !important; }
+        }
+    </style>
+</head>
+<body class="antialiased" onclick="closeActiveCard()">
+
+    <header class="mobile-top-bar glass-heavy lg:hidden">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center border border-indigo-500/30">
+                <img src="/sections/assets/logo.png" class="w-full h-full object-contain p-1.5" alt="L">
+            </div>
+            <div>
+                <h1 class="text-lg font-black text-white italic tracking-tighter uppercase leading-none">IRON<span class="text-indigo-500">.OPS</span></h1>
+                <p class="text-[7px] text-indigo-400 font-bold uppercase tracking-widest mt-0.5">v2.0 STABLE</p>
+            </div>
+        </div>
+        <button onclick="toggleSidebar(event)" class="w-12 h-12 glass rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/20">
+            <i class="fa-solid fa-bars-staggered text-lg"></i>
+        </button>
+    </header>
+
+    <div id="mobile-overlay" class="mobile-overlay" onclick="toggleSidebar(event)"></div>
+
+    <div id="notification-toast" class="glass px-6 py-4 rounded-[2rem] flex items-center gap-4 border-l-4 border-indigo-500 shadow-2xl">
+        <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500"><i class="fa-solid fa-bolt animate-pulse"></i></div>
+        <div>
+            <p class="text-[9px] font-black uppercase text-indigo-400 tracking-widest italic mb-1">Signal Protocol</p>
+            <p id="toast-msg" class="text-xs font-bold text-white uppercase italic">Confirmé</p>
+        </div>
+    </div>
+
+    <aside id="sidebar" class="sidebar flex flex-col" onclick="event.stopPropagation()">
+        <div class="p-8 border-b border-white/[0.03]">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-indigo-600/20 rounded-2xl flex items-center justify-center border border-indigo-500/30 overflow-hidden shrink-0">
+                    <img src="/sections/assets/logo.png" class="w-full h-full object-contain p-2" alt="L">
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-white italic tracking-tighter uppercase leading-none">IRON<span class="text-indigo-500">.OPS</span></h1>
+                    <p class="text-[8px] text-indigo-400 font-bold tracking-[0.1em] mt-1 bg-indigo-500/10 px-2 py-1 rounded-full border border-indigo-500/20 inline-block uppercase">ENCHÈRES v2.0 STABLE</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-6 overflow-y-auto">
+            <a onclick="showSection('section-dashboard', this)" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a href="/marcher-actuel" class="nav-link"><i class="fa-solid fa-shop"></i> Marché Actuel</a>
+            <a onclick="showSection('section-inventory', this)" class="nav-link"><i class="fa-solid fa-vault"></i> Inventaire</a>
+            <a onclick="showSection('section-bids', this)" class="nav-link nav-active"><i class="fa-solid fa-gavel"></i> Mes Enchères</a>
+            <a href="/portefeuille" class="nav-link"><i class="fa-solid fa-wallet"></i> Portefeuille</a>
+            <a href="/parametres" class="nav-link"><i class="fa-solid fa-gear"></i> Paramètres</a>
+        </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <a href="/api/logout" class="nav-link text-red-500/50 hover:text-red-500">
+                <i class="fa-solid fa-power-off"></i> Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content" id="main-scroll">
+        
+        <section id="section-dashboard" class="page-section">
+            <header class="mb-12">
+                <h2 class="text-5xl md:text-6xl font-[1000] italic uppercase text-white tracking-tighter">Terminal <span class="text-indigo-500">Tactique</span></h2>
+            </header>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid">
+                <div class="glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-white/5 text-6xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-wallet"></i></div>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-4 tracking-widest">Balance Disponible</p>
+                    <p class="text-4xl font-black italic">842,000 €</p>
+                </div>
+                <div class="glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-indigo-500/5 text-6xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-bolt"></i></div>
+                    <p class="text-indigo-500 text-[10px] font-bold uppercase mb-4 tracking-widest">Opérations en cours</p>
+                    <p class="text-4xl font-black italic">03</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-bids" class="page-section active">
+            <header class="mb-10">
+                <div class="flex items-center gap-3 text-indigo-500 font-black text-[10px] uppercase tracking-[0.4em] italic mb-4">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_15px_#6366f1] animate-pulse"></span> Surveillance Active
+                </div>
+                <h2 class="text-5xl md:text-6xl lg:text-8xl font-[1000] italic uppercase text-white tracking-tighter leading-[0.9] mb-4">
+                    Interception <br><span class="text-indigo-500">des flux</span>
+                </h2>
+                <p class="text-slate-500 font-mono text-xs uppercase tracking-[0.2em]">Données synchronisées via Node.Alpha-9</p>
+            </header>
+            
+            <div id="bids-mount" class="space-y-6 pb-40">
+                </div>
+        </section>
+
+        <section id="section-inventory" class="page-section">
+            <header class="mb-12">
+                <h2 class="text-5xl font-black italic uppercase text-white tracking-tighter">Archives <span class="text-indigo-500">Sécurisées</span></h2>
+            </header>
+            <div class="glass p-16 md:p-24 rounded-[3.5rem] text-center border border-white/5">
+                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i class="fa-solid fa-shield-halved text-4xl text-indigo-500/50"></i>
+                </div>
+                <p class="font-mono text-sm tracking-[0.3em] uppercase text-slate-500">Accès restreint au niveau Administrateur</p>
+                <div class="mt-8 flex justify-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                    <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                    <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let currentActiveId = null;
+        let products = [
+            {
+                id: 1, name: "Quantum CPU V8", cat: "Hardware de pointe", icon: "fa-microchip", price: 1250, status: "En tête", color: "emerald",
+                vault: "IRON-SAFE #09", condition: "Neuf / Certifié", timer: "02h 45m",
+                history: [ { u: "Moi", v: 1250, t: "Il y a 2m" }, { u: "User_44", v: 1200, t: "Il y a 5m" }, { u: "Admin", v: 1150, t: "Il y a 10m" } ],
+                chat: [ { u: "System", m: "Liaison cryptée établie." }, { u: "User_44", m: "C'est trop cher pour moi." } ]
+            },
+            {
+                id: 2, name: "Hyperion GT-X", cat: "Véhicule Prototype", icon: "fa-car-side", price: 260000, status: "Surenchéri", color: "red",
+                vault: "GENEVA VAULT", condition: "Prototype A1", timer: "00h 12m",
+                history: [ { u: "Vortex_X", v: 260000, t: "Il y a 1m" }, { u: "Moi", v: 245000, t: "Il y a 8m" } ],
+                chat: [ { u: "Vortex_X", m: "Laisse tomber, c'est mon jour." } ]
+            },
+            {
+                id: 3, name: "Black-Star SSD", cat: "Storage Unit", icon: "fa-database", price: 850, status: "Finalisé", color: "slate",
+                vault: "IRON-SAFE #02", condition: "Scellé", timer: "00h 00m",
+                history: [ { u: "Admin", v: 850, t: "Terminé" } ],
+                chat: [ { u: "System", m: "Enchère clôturée." } ]
+            }
+        ];
+
+        // --- NAVIGATION ET UI ---
+        function toggleSidebar(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('mobile-overlay').classList.toggle('open');
+        }
+
+        function showSection(id, el) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('nav-active'));
+            document.getElementById(id).classList.add('active');
+            if(el) el.classList.add('nav-active');
+            
+            // On scroll en haut au changement de section
+            document.getElementById('main-scroll').scrollTop = 0;
+            
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
+
+        // --- MOTEUR DE RENDU DES PRODUITS ---
+        function render() {
+            const mount = document.getElementById('bids-mount');
+            if(!mount) return;
+            
+            mount.innerHTML = products.map(p => `
+                <div id="card-${p.id}" class="bid-card glass p-8 md:p-10 rounded-[3rem] ${currentActiveId === p.id ? 'active' : ''}" onclick="openCard(event, ${p.id})">
+                    
+                    <button class="close-btn" onclick="event.stopPropagation(); closeActiveCard();">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                    <div class="card-header-main flex flex-col md:flex-row items-start md:items-center justify-between gap-8 ${currentActiveId === p.id ? 'mt-10 md:mt-0' : ''}">
+                        <div class="flex items-center gap-6 md:gap-8 w-full md:w-auto">
+                            <div class="w-16 h-16 md:w-24 md:h-24 shrink-0 rounded-[1.5rem] md:rounded-[2.2rem] bg-white/[0.03] border border-white/10 flex items-center justify-center text-3xl md:text-4xl text-indigo-500 shadow-2xl">
+                                <i class="fa-solid ${p.icon}"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl md:text-4xl font-[1000] text-white italic uppercase tracking-tighter leading-tight">${p.name}</h3>
+                                <p class="text-[10px] md:text-xs text-slate-500 font-black uppercase tracking-[0.3em] italic mt-2">${p.cat}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center w-full md:w-auto justify-between md:gap-16 border-t md:border-0 border-white/5 pt-6 md:pt-0">
+                            <div class="text-left md:text-right">
+                                <p class="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1 italic">Offre Actuelle</p>
+                                <p class="text-3xl md:text-5xl font-[1000] italic text-white tracking-tighter">
+                                    ${p.price.toLocaleString()} <span class="text-indigo-500 text-base md:text-xl">€</span>
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-end gap-3">
+                                <span class="status-pill bg-${p.color}-500/10 text-${p.color}-400 border border-${p.color}-500/20 shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+                                    ${p.status}
+                                </span>
+                                <span class="text-[11px] font-mono font-bold text-slate-500 flex items-center gap-2">
+                                    <i class="fa-regular fa-clock text-[10px]"></i> ${p.timer}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-pane" onclick="event.stopPropagation()">
+                        <div class="h-[1px] bg-white/5 my-10 shadow-[0_0_30px_rgba(99,102,241,0.1)]"></div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                            <div class="space-y-6">
+                                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic border-l-2 border-indigo-500 pl-4">Spécifications Node</p>
+                                <div class="bg-white/[0.02] p-7 rounded-[2rem] border border-white/5 space-y-4 font-mono text-xs">
+                                    <div class="flex justify-between"><span class="text-slate-500 uppercase">Vault ID</span><span class="text-white font-bold">${p.vault}</span></div>
+                                    <div class="flex justify-between"><span class="text-slate-500 uppercase">Condition</span><span class="text-emerald-500 font-bold">${p.condition}</span></div>
+                                    <div class="flex justify-between"><span class="text-slate-500 uppercase">Hash Key</span><span class="text-white/40 italic">0x${p.id}FC...92</span></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic mb-6">Flux des Offres</p>
+                                <div class="space-y-2 mb-6 max-h-48 overflow-y-auto custom-scroll pr-3">
+                                    ${p.history.map(h => `
+                                        <div class="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl text-[11px] font-mono group hover:border-indigo-500/30 transition-colors">
+                                            <span class="${h.u === 'Moi' ? 'text-indigo-400 font-black' : 'text-slate-500'} uppercase">${h.u}</span>
+                                            <span class="text-white font-black">${h.v.toLocaleString()} €</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="number" id="in-bid-${p.id}" class="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl text-xs text-white font-bold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all" placeholder="Entrer montant...">
+                                    <button onclick="submitBid(${p.id})" class="px-8 bg-indigo-600 text-white font-black text-[10px] uppercase rounded-2xl hover:bg-white hover:text-black transition-all shadow-lg shadow-indigo-600/10">Valider</button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic mb-6">Comms Directes</p>
+                                <div class="glass bg-black/40 rounded-[2.2rem] p-5 h-48 overflow-y-auto mb-4 font-mono text-[10px] space-y-3 shadow-inner" id="chat-${p.id}">
+                                    ${p.chat.map(m => `
+                                        <div class="p-3 bg-white/[0.02] rounded-xl border-l-2 border-white/10">
+                                            <span class="text-indigo-500 font-black uppercase text-[9px] tracking-tighter">[${m.u}]</span>
+                                            <p class="text-white/80 mt-1 leading-relaxed">${m.m}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="relative">
+                                    <input type="text" id="in-chat-${p.id}" onkeypress="if(event.key==='Enter') submitChat(${p.id})" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-xs text-white italic pr-12 outline-none focus:border-indigo-500" placeholder="Encoder un message...">
+                                    <button onclick="submitChat(${p.id})" class="absolute right-2 top-2 w-10 h-10 bg-indigo-500/20 text-indigo-500 rounded-xl flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- ACTIONS CORE ---
+        function openCard(event, id) {
+            event.stopPropagation();
+            if(currentActiveId === id) return;
+            currentActiveId = id;
+            render();
+            setTimeout(() => { 
+                const el = document.getElementById(`card-${id}`);
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function closeActiveCard() {
+            if(currentActiveId === null) return;
+            currentActiveId = null;
+            render();
+        }
+
+        function submitBid(id) {
+            const input = document.getElementById(`in-bid-${id}`);
+            const val = parseInt(input.value);
+            const p = products.find(x => x.id === id);
+            if(!val || val <= p.price) return showToast("Echec : Montant trop faible", true);
+            
+            p.price = val; p.status = "En tête"; p.color = "emerald";
+            p.history.unshift({ u: "Moi", v: val, t: "Maintenant" });
+            render();
+            showToast(`Signal : Nouvelle offre confirmée (${val} €)`);
+        }
+
+        function submitChat(id) {
+            const input = document.getElementById(`in-chat-${id}`);
+            if(!input.value) return;
+            products.find(x => x.id === id).chat.push({ u: "Moi", m: input.value });
+            render();
+            const box = document.getElementById(`chat-${id}`);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function showToast(msg, error = false) {
+            const t = document.getElementById('notification-toast');
+            document.getElementById('toast-msg').innerText = msg.toUpperCase();
+            t.style.borderColor = error ? "#ef4444" : "#6366f1";
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
